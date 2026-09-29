@@ -1,3 +1,10 @@
+## 2026-09-29 — Publish the atlas
+
+- 변경 파일: GitHub, Vercel, Cloudflare DNS; `README.md`
+- 요약: 공개 GitHub 저장소에 소스와 데이터 CSV를 올리고 Vercel production에 배포했으며 `atlas.bsiku.dev`를 Cloudflare DNS로 연결했습니다.
+
+GitHub 저장소는 `bsiku3622/typhoon-atlas`이며 Vercel에서 제공한 도메인 전용 CNAME을 Cloudflare에 DNS 전용으로 등록했습니다. DNS 확인 및 SSL 발급 후 Vercel 도메인 상태가 `Valid Configuration`으로 바뀌었고 앱·주요 CSV의 HTTP 200 응답을 확인했습니다.
+
 ## 2026-09-29 — Apply current Paper UI typography system
 
 - 변경 파일: `src/styles.css`
