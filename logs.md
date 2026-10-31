@@ -1,9 +1,37 @@
+## 2026-10-31 — Consolidate cyclone research notes
+
+- 변경 파일: [연구 통합 정리](/Users/baeks/Reports/2026-10-31_19-18-wnp-typhoon-research-compendium.md); 다운로드 폴더의 Markdown 사본
+- 요약: 확정한 제목·계획형 초록·연구 단계·Rotunno–Emanuel 실험안·물리 개념·선행 연구·자료 출처와 기존 예비 통계 결과를 한 문서로 모았습니다.
+
+이전 논의의 SST 중심·습도 의존성 대안과 현재 선택한 대기 온도 독립변인 실험을 구분하고, 습도 통제는 최신 실험안의 초기 비습 고정으로 정리했습니다. MPI 계산·모델 실행 계획을 이미 완료한 관측 강도 분석과 구분했습니다. 통계 결과는 2026-10-19 원 보고서와 CSV·manifest를 확인해 수록했으며 이번 작업에서 재계산하거나 모델을 실행하지 않았습니다. 다운로드 폴더가 정리돼도 자료가 남도록 그림과 계산표 링크는 프로젝트 보관본을 가리키고 원본 Markdown은 Reports에 두었습니다.
+
+## 2026-10-19 — Analyze WNP temperature and observed intensity
+
+- 변경 파일: `scripts/analyze_wnp_step2.py`, `scripts/requirements-analysis.txt`, `research/step2-wnp-1980-2024/`, `README.md`; [결과 보고서](/Users/baeks/Reports/2026-10-19_16-09-wnp-cyclone-temperature-analysis.md)
+- 요약: 1980–2024년 JMA 풍속 기준 열대저기압 1,141개와 HadISDH 원본 격자로 연간 추세·연도 통제 상관·HAC 불확실성 및 민감도를 계산했습니다.
+
+풍속 평균 시간의 기관 간 혼합을 줄이려고 원본 TOKYO_WIND와 열대 단계 분류를 사용하고 spur 경로를 제외했습니다. 기온 원본 60개 영역 격자 중 전 기간 관측이 있는 격자는 14개뿐이고 서쪽에 집중되어, 전체 해역 평균이라는 해석을 피하고 32개 고관측률 격자 결과도 비교했습니다. 지역 기온은 +0.114°C/10년 추세였지만 연도 통제 후 기온–평균 최대 풍속 부분 r은 −0.080, p=0.599였습니다. 64 kt 이상 비율 감소 추세도 온난화의 인과 효과로 해석할 수 없습니다. MPI·SST·연직 환경은 아직 계산에 포함하지 않았습니다. JMA 공식 일부 연도 발생 수와 2024년 태풍급 개수를 대조하고 태풍별/연도별 합계 및 그림을 확인했습니다. 재현에 쓰인 원본은 변경하지 않았고, 패키지는 작업 전용 가상환경에만 추가했습니다.
+
+## 2026-10-19 — Review cyclone term project feasibility
+
+- 변경 파일: [연구 주제 적합성 검토 보고서](/Users/baeks/Reports/2026-10-19_14-50-tropical-cyclone-project-feasibility.md)
+- 요약: PI 계산·관측 추세·통제 실험을 연결하는 선행 연구를 조사하고 일반지구과학 텀프로젝트의 범위와 독창성을 평가했습니다.
+
+Done et al. (2022)와 Delfino et al. (2024)에 매우 가까운 설계가 이미 있어 온도 상승 자체를 새로운 발견으로 주장하지 않기로 했습니다. 핵심 질문은 SST만 상승시키는 경우와 대기 열구조·수증기 가정까지 변경하는 경우의 추정 차이로 좁히는 것이 적절합니다. pyPI는 열역학적 잠재강도 계산이며 실제 태풍 발달이나 연직 시어·건조 공기 유입을 직접 모의하지 않는다는 한계가 있습니다. CM1은 기준 실험 재현 후 판단할 확장으로 두고, 실제 자료 취득·성능 측정은 이번 문헌 검토에서 수행하지 않았습니다.
+
 ## 2026-09-29 — Publish the atlas
 
 - 변경 파일: GitHub, Vercel, Cloudflare DNS; `README.md`
 - 요약: 공개 GitHub 저장소에 소스와 데이터 CSV를 올리고 Vercel production에 배포했으며 `atlas.bsiku.dev`를 Cloudflare DNS로 연결했습니다.
 
 GitHub 저장소는 `bsiku3622/typhoon-atlas`이며 Vercel에서 제공한 도메인 전용 CNAME을 Cloudflare에 DNS 전용으로 등록했습니다. DNS 확인 및 SSL 발급 후 Vercel 도메인 상태가 `Valid Configuration`으로 바뀌었고 앱·주요 CSV의 HTTP 200 응답을 확인했습니다.
+
+## 2026-09-29 — Add temperature–cyclone relationship charts
+
+- 변경 파일: `src/App.tsx`, `src/styles.css`, `README.md`
+- 요약: 1980–2024년 기온 편차와 태풍 발생 수, 64 kt 이상 태풍 수, 연평균 최대풍속의 산점도를 추가했습니다.
+
+HadISDH 전 지구 평균 또는 30°S–30°N 열대 평균을 선택하고 현재 해역 필터에 맞춘 IBTrACS 연간 통계를 비교합니다. 시간의 공통 상승 추세가 상관을 부풀릴 수 있어 원 Pearson r과 연도 선형 추세 제거 후 r을 함께 표시합니다. HadISDH 2 m 기온은 SST가 아니므로 이를 태풍의 열역학적 원인 분석으로 해석할 수 없다는 주의도 뷰어와 README에 밝혔습니다.
 
 ## 2026-09-29 — Apply current Paper UI typography system
 

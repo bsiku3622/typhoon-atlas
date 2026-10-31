@@ -1,0 +1,192 @@
+{
+  "period": [
+    1980,
+    2024
+  ],
+  "storm_quality": {
+    "raw_wp_records": 100970,
+    "track_types": {
+      "main": 100386,
+      "spur-merge": 440,
+      "spur-other": 83,
+      "spur-split": 61
+    },
+    "main_wp_records": 100386,
+    "main_wp_sids": 1446,
+    "jma_tropical_records": 46944,
+    "jma_tsplus_sids": 1141,
+    "main_sids_without_valid_jma_tropical_wind": 305,
+    "jma_grade_counts_main": {
+      "2.0": 20567,
+      "5.0": 18687,
+      "3.0": 17451,
+      "4.0": 11822,
+      "6.0": 8952,
+      "7.0": 21
+    },
+    "duplicate_sid_times": 0,
+    "wind_definition": "TOKYO_WIND, JMA 10-minute sustained wind, knots",
+    "population": "main-track WP systems with JMA tropical-grade peak >=34 kt",
+    "peak_definition": "max JMA wind while in WP and JMA grade 3,4,5,9; earliest time in a tie",
+    "season_definition": "peak-month assigned; annual 1–12, Jun–Nov 6–11"
+  },
+  "climate_quality": {
+    "box": {
+      "latitude": [
+        5,
+        30
+      ],
+      "longitude": [
+        120,
+        180
+      ]
+    },
+    "source": "HadISDH.blendT 1.5.1.2024f, 5-degree grid",
+    "variable": "near-surface air-temperature anomaly relative to 1991–2020; NOT SST",
+    "domain_cells": 60,
+    "complete_cells": 14,
+    "coverage80_cells": 32,
+    "mean_observed_cell_fraction": 0.7006172839506173,
+    "complete_mask_extent": {
+      "lat": [
+        7.5,
+        27.5
+      ],
+      "lon": [
+        122.5,
+        142.5
+      ]
+    },
+    "primary_mask": "same cells observed in all 540 months; no interpolation",
+    "aggregation": "cos(latitude) monthly weighted anomalies, equal-month annual/season means",
+    "warning": "blend includes land/marine air; sparse fixed stations are not a full ocean-basin mean"
+  },
+  "official_count_checks": {
+    "checks": [
+      {
+        "year": 1980,
+        "metric": "count_ts",
+        "expected": 24,
+        "actual": 24,
+        "matches": true
+      },
+      {
+        "year": 2023,
+        "metric": "count_ts",
+        "expected": 17,
+        "actual": 17,
+        "matches": true
+      },
+      {
+        "year": 2024,
+        "metric": "count_ts",
+        "expected": 26,
+        "actual": 26,
+        "matches": true
+      },
+      {
+        "year": 2024,
+        "metric": "count64",
+        "expected": 13,
+        "actual": 13,
+        "matches": true
+      }
+    ],
+    "sources": [
+      "https://www.data.jma.go.jp/typhoon/statistics/generation/generation.html",
+      "https://www.jma.go.jp/jma/jma-eng/jma-center/rsmc-hp-pub-eg/AnnualReport/2024/Text/Text2024.pdf"
+    ]
+  },
+  "inputs": [
+    {
+      "path": "/Users/baeks/Bufs/Codex Files/2026-09-28/ibtracs/ibtracs.since1980.list.v04r01.csv",
+      "size_bytes": 144072170,
+      "sha256": "22a86fb7fa91f6f6bb33a0f55f2fab40b5fe8ebfc7c99e57fb360e751f5519e2"
+    },
+    {
+      "path": "/Users/baeks/Bufs/Codex Files/2026-09-28/climate/hadisdh-blend-2024/HadISDH.blendT.1.5.1.2024f_FLATgridHOMBClocalSHIPboth5by5_anoms9120.nc",
+      "size_bytes": 43149112,
+      "sha256": "3ee38c6afbfd6c4d4af1ee988b2db1c62d24326f395f634a23dffbb01e88ca9d"
+    }
+  ],
+  "packages": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scipy": "1.18.1",
+    "statsmodels": "0.15.0",
+    "matplotlib": "3.11.2",
+    "netCDF4": "1.7.5"
+  },
+  "agency_sensitivity": {
+    "n_common_storms": 1124,
+    "definition": "same JMA TS+ systems and JMA tropical-grade observation times; no wind-duration conversion",
+    "results": [
+      {
+        "season": "",
+        "predictor": "temperature_complete_c",
+        "metric": "jma_mean_peak_10min_kt",
+        "start": 1980,
+        "end": 2024,
+        "n_years": 45,
+        "hac_lags": 3,
+        "pearson_r": -0.17548991821884932,
+        "spearman_rho": -0.16561264822134386,
+        "partial_r_year": -0.07343905329903411,
+        "temperature_beta_per_c": -2.0463633904434473,
+        "temperature_ci_low": -10.890376142842397,
+        "temperature_ci_high": 6.797649361955502,
+        "temperature_p_hac": 0.6429476991350055,
+        "unadjusted_beta_per_c": -3.9703208694882424,
+        "unadjusted_p_hac": 0.1591251211860163,
+        "temperature_year_r": 0.6049096776876268,
+        "residual_lag1": 0.10969175429987686,
+        "slope_per_decade": -0.8347072049178217,
+        "trend_ci_low": -1.7759952956090705,
+        "trend_ci_high": 0.10658088577342728,
+        "trend_p_hac": 0.08076775480444674
+      },
+      {
+        "season": "",
+        "predictor": "temperature_complete_c",
+        "metric": "usa_mean_peak_1min_kt",
+        "start": 1980,
+        "end": 2024,
+        "n_years": 45,
+        "hac_lags": 3,
+        "pearson_r": -0.09323476076111083,
+        "spearman_rho": -0.09387660995243942,
+        "partial_r_year": -0.09994264192892448,
+        "temperature_beta_per_c": -4.087344721104324,
+        "temperature_ci_low": -13.931419298641018,
+        "temperature_ci_high": 5.7567298564323695,
+        "temperature_p_hac": 0.40681615825859785,
+        "unadjusted_beta_per_c": -3.0370555877019836,
+        "unadjusted_p_hac": 0.4319263977190614,
+        "temperature_year_r": 0.6049096776876268,
+        "residual_lag1": 0.12056017703042385,
+        "slope_per_decade": -0.13907899963672143,
+        "trend_ci_low": -1.7218893692847594,
+        "trend_ci_high": 1.4437313700113166,
+        "trend_p_hac": 0.8601806270334819
+      }
+    ]
+  },
+  "inference": {
+    "regression": "OLS; HAC Newey–West covariance; Bartlett default, lags=3, finite-sample correction, Student-t intervals",
+    "primary": "annual complete fixed-cell temperature; three core endpoints",
+    "primary_endpoints": [
+      "count_ts",
+      "mean_peak_kt",
+      "share64_pct"
+    ],
+    "adjustment": "linear year term; exploratory association, not causal attribution",
+    "multiplicity": "BH across 3 primary temperature coefficients; all exploratory coefficients also adjusted together",
+    "sensitivity": "June–November peak-month subset, 1990/2000 starts, coverage80/available masks, HAC lags 1 and 5",
+    "not_done": [
+      "potential intensity",
+      "SST or vertical temperature effects",
+      "ENSO/shear control",
+      "observation homogenization"
+    ]
+  }
+}

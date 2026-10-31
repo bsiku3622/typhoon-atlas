@@ -25,6 +25,7 @@ Visit [atlas.bsiku.dev](https://atlas.bsiku.dev).
 - Source resolution is 5° x 5°. The viewer samples every other source cell for a 10° display grid. It does not interpolate missing cells.
 - Selection reason: HadISDH provides observed, quality-controlled, homogenized temperature and humidity on a shared global grid, with a fixed reference period and uncertainty fields. The 2024 release is the latest complete version; the 2025 release is provisional and its producer warns of reduced spatial coverage.
 - The displayed global trend uses area-weighted monthly anomaly averages across observed cells. Coverage is uneven and should be considered when interpreting a global mean.
+- The viewer compares annual cyclone counts, counts at or above 64 kt, and mean storm peak wind against global or tropical (30°S–30°N) 2 m temperature anomalies for the common 1980–2024 period. It reports Pearson correlation and correlation after separately removing each series' linear year trend. These are exploratory associations, not causal estimates; HadISDH air temperature is not sea-surface temperature (SST), and observed grid coverage is uneven.
 
 ### Upper-air context for air-mass analysis — NOAA NCEP/NCAR Reanalysis 1
 
@@ -46,6 +47,12 @@ python3 scripts/download_ncep_airmass.py
 ```
 
 The cyclone source CSV is expected at `~/Bufs/Codex Files/2026-09-28/ibtracs/ibtracs.since1980.list.v04r01.csv`. The climate script downloads raw NetCDF files to the dated `Bufs` folder and writes compact global-grid CSVs under `public/data/`.
+
+## Research analysis — WNP, 1980–2024
+
+The exploratory observed-intensity analysis is saved in `research/step2-wnp-1980-2024/`. It uses JMA 10-minute winds from the original IBTrACS CSV, excludes spur tracks, and selects tropical-stage systems reaching 34 kt. Regional HadISDH air-temperature indices use the original 5-degree grid; the primary index retains only cells observed in every month. It is not SST or a complete ocean-basin temperature mean.
+
+Reproduce with `python scripts/analyze_wnp_step2.py --ibtracs <raw.csv> --temperature <raw.nc> --output <directory>` after installing `scripts/requirements-analysis.txt`. Results include annual tables, HAC uncertainty estimates, linear-year-adjusted associations, sensitivity analyses, figures, and an input checksum manifest. The report is `research/step2-wnp-1980-2024/report.md`. Potential intensity has not yet been calculated.
 
 ## Run
 
