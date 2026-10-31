@@ -16,6 +16,7 @@ type ChartSeries = { name: string; color: string; values: (number | null)[] };
 type ClimateRow = { year: number; month: number; gridId: number; lat: number; lon: number; temperature: number; humidity: number; temperatureAnomaly: number; humidityAnomaly: number };
 type ClimateNormal = { month: number; gridId: number; lat: number; lon: number; temperature: number; humidity: number };
 type AirMassRow = { month: number; gridId: number; lat: number; lon: number; temperature850: number; humidity850: number; height500: number; u850: number; v850: number };
+type TemperatureStormPoint = { year: number; globalTemperature: number; tropicalTemperature: number; count: number; strongCount: number; meanPeakWind: number | null };
 
 function ZoomableSvg({ className, ariaLabel, children }: { className: string; ariaLabel: string; children: ReactNode }) {
   const [view, setView] = useState({ scale: 1, x: 0, y: 0 });
@@ -85,6 +86,67 @@ function LineChart({ years, series, label, unit, height = 126 }: { years: number
   </div>;
 }
 
+function fitLine(points: { x: number; y: number }[]) {
+  if (points.length < 2) return null;
+  const meanX = points.reduce((sum, point) => sum + point.x, 0) / points.length;
+  const meanY = points.reduce((sum, point) => sum + point.y, 0) / points.length;
+  const covariance = points.reduce((sum, point) => sum + (point.x - meanX) * (point.y - meanY), 0);
+  const varianceX = points.reduce((sum, point) => sum + (point.x - meanX) ** 2, 0);
+  const varianceY = points.reduce((sum, point) => sum + (point.y - meanY) ** 2, 0);
+  if (!varianceX || !varianceY) return null;
+  const slope = covariance / varianceX;
+  return { slope, intercept: meanY - slope * meanX, correlation: covariance / Math.sqrt(varianceX * varianceY) };
+}
+
+function TemperatureRelationshipChart({ rows, temperatureScope, metric, title, description, color }: {
+  rows: TemperatureStormPoint[];
+  temperatureScope: "globalTemperature" | "tropicalTemperature";
+  metric: "count" | "strongCount" | "meanPeakWind";
+  title: string;
+  description: string;
+  color: string;
+}) {
+  const validRows = rows.flatMap((row) => {
+    const y = row[metric];
+    return y === null ? [] : [{ year: row.year, x: row[temperatureScope], y }];
+  });
+  const regression = fitLine(validRows);
+  const xValues = validRows.map((point) => point.x);
+  const yValues = validRows.map((point) => point.y);
+  const xMin = Math.min(...xValues, -0.1);
+  const xMax = Math.max(...xValues, 0.1);
+  const yMin = Math.min(...yValues, 0);
+  const yMax = Math.max(...yValues, 1);
+  const xPad = Math.max((xMax - xMin) * 0.08, 0.04);
+  const yPad = Math.max((yMax - yMin) * 0.08, metric === "meanPeakWind" ? 1 : 0.5);
+  const left = 48; const right = 338; const top = 14; const bottom = 160;
+  const x = (value: number) => left + (value - (xMin - xPad)) / (xMax - xMin + 2 * xPad) * (right - left);
+  const y = (value: number) => bottom - (value - (yMin - yPad)) / (yMax - yMin + 2 * yPad) * (bottom - top);
+  const residualize = (key: "x" | "y") => {
+    const yearFit = fitLine(validRows.map((point) => ({ x: point.year, y: point[key] })));
+    return yearFit ? validRows.map((point) => ({ year: point.year, residual: point[key] - (yearFit.intercept + yearFit.slope * point.year) })) : [];
+  };
+  const xResiduals = residualize("x"); const yResiduals = residualize("y");
+  const yResidualByYear = new Map(yResiduals.map((point) => [point.year, point.residual]));
+  const detrended = fitLine(xResiduals.flatMap((point) => { const residual = yResidualByYear.get(point.year); return residual === undefined ? [] : [{ x: point.residual, y: residual }]; }));
+  const decadeColor = (year: number) => year < 1990 ? PUI.info : year < 2000 ? PUI.success : year < 2010 ? PUI.warning : year < 2020 ? PUI.error : PUI.ink;
+  const xTicks = [xMin, (xMin + xMax) / 2, xMax];
+  const yTicks = [yMin, (yMin + yMax) / 2, yMax];
+  return <article className="panel analytics-card temperature-chart-card">
+    <div className="panel-heading"><div><Text variant="heading" as="h3">{title}</Text><Text variant="caption">{description}</Text></div></div>
+    <div className="relationship-stats"><span>Pearson r <b>{regression ? regression.correlation.toFixed(2) : "—"}</b></span><span>연도 추세 제거 r* <b>{detrended ? detrended.correlation.toFixed(2) : "—"}</b></span><span>연도 <b>{validRows.length}</b></span></div>
+    <svg className="relationship-chart" viewBox="0 0 360 205" role="img" aria-label={`${title}: 기온 편차와 태풍 ${description}의 상관 그래프`}>
+      {yTicks.map((tick, index) => <g key={index}><line x1={left} x2={right} y1={y(tick)} y2={y(tick)} className="chart-gridline" /><text x={left - 7} y={y(tick) + 3} textAnchor="end" className="chart-tick">{metric === "meanPeakWind" ? tick.toFixed(0) : tick.toFixed(0)}</text></g>)}
+      {xTicks.map((tick, index) => <text key={index} x={x(tick)} y={bottom + 15} textAnchor={index === 0 ? "start" : index === xTicks.length - 1 ? "end" : "middle"} className="chart-tick">{tick.toFixed(1)}</text>)}
+      {regression && <line x1={x(xMin - xPad)} y1={y(regression.intercept + regression.slope * (xMin - xPad))} x2={x(xMax + xPad)} y2={y(regression.intercept + regression.slope * (xMax + xPad))} stroke={color} strokeWidth="1.5" strokeDasharray="4 3" opacity=".75" />}
+      {validRows.map((point) => <circle key={point.year} cx={x(point.x)} cy={y(point.y)} r="3.2" fill={decadeColor(point.year)} stroke="var(--pui-color-bg-raised)" strokeWidth="1"><title>{`${point.year} · 기온 편차 ${point.x.toFixed(2)} °C · ${description} ${point.y.toFixed(metric === "meanPeakWind" ? 1 : 0)}`}</title></circle>)}
+      <text x={(left + right) / 2} y="199" textAnchor="middle" className="scatter-axis-title">기온 편차 (°C)</text>
+      <text transform={`translate(11 ${(top + bottom) / 2}) rotate(-90)`} textAnchor="middle" className="scatter-axis-title">{metric === "meanPeakWind" ? "평균 최대풍속 (kt)" : "태풍 수"}</text>
+    </svg>
+    <div className="decade-legend">{[["80년대", PUI.info], ["90년대", PUI.success], ["00년대", PUI.warning], ["10년대", PUI.error], ["20년대", PUI.ink]].map(([label, decadeColor]) => <span key={label as string}><i style={{ background: decadeColor as string }} />{label}</span>)}</div>
+  </article>;
+}
+
 const topo = countries as unknown as CountryTopology;
 const land = feature(topo, topo.objects.countries) as Feature<Geometry>;
 const projection = geoEquirectangular().center([0, 0]).scale(130).translate([410, 230]);
@@ -133,6 +195,7 @@ export function App() {
   const [climateYear, setClimateYear] = useState("2024");
   const [climateMonth, setClimateMonth] = useState(8);
   const [climateMetric, setClimateMetric] = useState<"temperature" | "humidity" | "airmass" | "upperair">("temperature");
+  const [temperatureScope, setTemperatureScope] = useState<"globalTemperature" | "tropicalTemperature">("tropicalTemperature");
 
   useEffect(() => {
       Papa.parse<Record<string, string>>("/data/ibtracs_global_since1980.csv", {
@@ -227,20 +290,38 @@ export function App() {
     const yearlyClimate = [...new Set(climateRows.map((row) => row.year))].sort((a, b) => a - b).map((year) => {
       const rows = climateRows.filter((row) => row.year === year);
       const monthly = Array.from({ length: 12 }, (_, month) => rows.filter((row) => row.month === month + 1));
-      const mean = (monthRows: ClimateRow[], field: "temperatureAnomaly" | "humidityAnomaly") => {
-        if (!monthRows.length) return null;
-        const weighted = monthRows.reduce((sum, row) => sum + row[field] * Math.cos(row.lat * Math.PI / 180), 0);
-        return weighted / monthRows.reduce((sum, row) => sum + Math.cos(row.lat * Math.PI / 180), 0);
+      const mean = (monthRows: ClimateRow[], field: "temperatureAnomaly" | "humidityAnomaly", tropicalOnly = false) => {
+        const selected = tropicalOnly ? monthRows.filter((row) => Math.abs(row.lat) <= 30) : monthRows;
+        if (!selected.length) return null;
+        const weighted = selected.reduce((sum, row) => sum + row[field] * Math.cos(row.lat * Math.PI / 180), 0);
+        return weighted / selected.reduce((sum, row) => sum + Math.cos(row.lat * Math.PI / 180), 0);
       };
       const tValues = monthly.map((monthRows) => mean(monthRows, "temperatureAnomaly")).filter((value): value is number => value !== null);
+      const tropicalTValues = monthly.map((monthRows) => mean(monthRows, "temperatureAnomaly", true)).filter((value): value is number => value !== null);
       const rhValues = monthly.map((monthRows) => mean(monthRows, "humidityAnomaly")).filter((value): value is number => value !== null);
-      return { year, temperatureAnomaly: tValues.length ? tValues.reduce((sum, value) => sum + value, 0) / tValues.length : null, humidityAnomaly: rhValues.length ? rhValues.reduce((sum, value) => sum + value, 0) / rhValues.length : null };
+      return { year, temperatureAnomaly: tValues.length ? tValues.reduce((sum, value) => sum + value, 0) / tValues.length : null, tropicalTemperatureAnomaly: tropicalTValues.length ? tropicalTValues.reduce((sum, value) => sum + value, 0) / tropicalTValues.length : null, humidityAnomaly: rhValues.length ? rhValues.reduce((sum, value) => sum + value, 0) / rhValues.length : null };
     });
     return { displayRows, yearlyClimate, airMass: airMassRows.filter((row) => row.month === climateMonth) };
   }, [climateRows, climateNormals, airMassRows, climateMonth, climateYear]);
   const climateMapRows = climateMetric === "upperair"
     ? climate.airMass.map((row) => ({ gridId: row.gridId, lat: row.lat, lon: row.lon, temperature: row.temperature850, humidity: row.humidity850, normalTemperature: row.temperature850, normalHumidity: row.humidity850, temperatureAnomaly: 0, humidityAnomaly: 0, h500: row.height500, u850: row.u850, v850: row.v850 }))
     : climate.displayRows.map((row) => ({ ...row, h500: null as number | null, u850: null as number | null, v850: null as number | null }));
+  const temperatureStormRows = useMemo(() => {
+    const temperatures = new Map(climate.yearlyClimate.map((row) => [row.year, row]));
+    const stormsByYear = new Map<number, Storm[]>();
+    for (const storm of storms) {
+      if (storm.season < 1980 || storm.season > 2024) continue;
+      const list = stormsByYear.get(storm.season) ?? [];
+      list.push(storm); stormsByYear.set(storm.season, list);
+    }
+    return Array.from({ length: 45 }, (_, index) => 1980 + index).flatMap((year) => {
+      const climateYearData = temperatures.get(year);
+      if (!climateYearData || climateYearData.temperatureAnomaly === null || climateYearData.tropicalTemperatureAnomaly === null) return [];
+      const annualStorms = stormsByYear.get(year) ?? [];
+      const winds = annualStorms.map((storm) => storm.peakWind).filter((wind) => wind > 0);
+      return [{ year, globalTemperature: climateYearData.temperatureAnomaly, tropicalTemperature: climateYearData.tropicalTemperatureAnomaly, count: annualStorms.length, strongCount: winds.filter((wind) => wind >= 64).length, meanPeakWind: winds.length ? winds.reduce((sum, wind) => sum + wind, 0) / winds.length : null }];
+    });
+  }, [climate.yearlyClimate, storms]);
   const yFor = (lat: number) => projection([0, lat])?.[1] ?? 0;
   const xFor = (lon: number) => projection([normalizeLongitude(lon), 0])?.[0] ?? 0;
 
@@ -339,6 +420,18 @@ export function App() {
             </article>
           </div>
           <p className="analysis-note">풍속 기준은 IBTrACS WMO_WIND(knot)이며 기관별 지속시간 기준 차이는 보정하지 않았습니다. 2026년은 진행 중입니다. 경로 중심은 태풍별 관측 좌표 평균으로 계산하므로 이동거리나 경로 밀도와는 다른 지표입니다.</p>
+        </section>
+
+        <section className="temperature-relationships" aria-label="기온과 태풍 발생·강도 관계">
+          <div className="analytics-heading temperature-relationship-heading"><div><Text variant="heading" as="h2">기온 편차와 태풍 경향</Text><Text variant="caption">1980–2024년 · HadISDH 월별 기온 편차와 IBTrACS 연간 통계</Text></div>
+            <div className="metric-switch" role="group" aria-label="기온 범위 선택"><button className={temperatureScope === "globalTemperature" ? "active" : ""} onClick={() => setTemperatureScope("globalTemperature")}>전 지구 평균</button><button className={temperatureScope === "tropicalTemperature" ? "active" : ""} onClick={() => setTemperatureScope("tropicalTemperature")}>열대 위도대 (30°S–30°N)</button></div>
+          </div>
+          <div className="temperature-relationship-grid">
+            <TemperatureRelationshipChart rows={temperatureStormRows} temperatureScope={temperatureScope} metric="count" title="연간 태풍 발생 수" description="연간 발생 수" color={PUI.info} />
+            <TemperatureRelationshipChart rows={temperatureStormRows} temperatureScope={temperatureScope} metric="strongCount" title="64 kt 이상 태풍 수" description="64 kt 이상 태풍 수" color={PUI.warning} />
+            <TemperatureRelationshipChart rows={temperatureStormRows} temperatureScope={temperatureScope} metric="meanPeakWind" title="평균 최대풍속" description="태풍별 최대풍속 평균 (kt)" color={PUI.error} />
+          </div>
+          <p className="analysis-note">점 하나는 한 해를 뜻하며 색은 10년 단위입니다. 기온은 관측된 격자만 위도 면적 가중해 계산하고, 태풍은 현재 선택한 해역 기준 고유 SID로 집계합니다. Pearson r은 원자료 상관, r*은 연도에 따른 직선 추세를 각각 제거한 잔차 간 상관입니다. 두 값 모두 인과관계를 뜻하지 않습니다. HadISDH의 2 m 지표면 공기 온도는 해수면온도(SST)를 대체하지 못하므로, 이 그래프는 전 지구적 동행 경향의 탐색용 비교입니다. 기후자료가 끝나는 2024년까지만 비교합니다.</p>
         </section>
 
         <section className="climate-section" aria-label="전 세계 기온·습도와 기단 조건">
