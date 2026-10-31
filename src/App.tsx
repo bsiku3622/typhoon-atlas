@@ -329,7 +329,7 @@ export function App() {
     <main className="atlas-shell">
       <header className="topbar">
         <a className="brand" href="#top"><span className="brand-mark"><Wind size={16} /></span> Cyclone Atlas</a>
-          <div className="topbar-right"><span className="source-dot" /> NOAA IBTrACS v04r01 <span className="topbar-divider" /> Global · 1980–2026</div>
+          <div className="topbar-right"><a className="topbar-link" href="#research">연구 현황</a> <span className="topbar-divider" /> <span className="source-dot" /> NOAA IBTrACS v04r01 <span className="topbar-divider" /> Global · 1980–2026</div>
       </header>
 
       <div className="page" id="top">

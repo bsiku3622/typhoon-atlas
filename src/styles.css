@@ -220,6 +220,30 @@ button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible
 .footer a { display: inline-flex; align-items: center; gap: 4px; color: var(--pui-color-ink-secondary); text-decoration: none; }
 .footnote { flex-basis: 100%; color: var(--pui-color-ink-tertiary); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.topbar-link { display: inline-flex; align-items: center; gap: 5px; color: var(--pui-color-ink-primary); font-weight: var(--pui-text-weight-semibold); text-decoration: none; white-space: nowrap; }
+.topbar-link:hover { text-decoration: underline; }
+.research-page { display: flex; flex-direction: column; gap: 14px; }
+.research-intro { max-width: 860px; margin-bottom: 8px; }
+.research-intro h1 { margin: 6px 0 10px; font-size: var(--pui-text-size-display); line-height: var(--pui-text-leading-display); letter-spacing: var(--pui-text-tracking-display); font-weight: var(--pui-text-weight-bold); }
+.research-intro p { margin: 0 0 8px; color: var(--pui-color-ink-secondary); }
+.research-eyebrow, .research-kind { color: var(--pui-color-ink-tertiary); font-size: var(--pui-text-size-caption); white-space: nowrap; }
+.research-notice { font-size: var(--pui-text-size-caption); color: var(--pui-color-ink-tertiary) !important; }
+.research-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.research-panel { padding: 18px 20px; margin: 0; }
+.research-panel h2 { margin: 0 0 3px; }
+.research-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; }
+.research-list li { padding: 11px 0; border-top: 1px solid var(--pui-color-border-base); display: flex; flex-direction: column; gap: 4px; }
+.research-list li:first-child { border-top: 0; }
+.research-list li > span { color: var(--pui-color-ink-secondary); }
+.research-row { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+.research-row strong { font-weight: var(--pui-text-weight-semibold); }
+.research-row > :last-child { flex-shrink: 0; }
+.research-table { margin-top: 12px; overflow-x: auto; }
+.research-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.research-figures img { display: block; width: 100%; height: auto; border-radius: 4px; }
+.research-figures figcaption { display: flex; flex-direction: column; gap: 3px; margin-top: 10px; }
+.research-figures figcaption span { color: var(--pui-color-ink-secondary); font-size: var(--pui-text-size-caption); }
+@media (max-width: 800px) { .research-grid, .research-figures { grid-template-columns: minmax(0, 1fr); } .research-row { flex-wrap: wrap; } .research-kind { white-space: normal; } }
 @media (max-width: 1100px) { .temperature-relationship-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.temperature-chart-card:last-child { grid-column: 1 / -1; } }
 @media (max-width: 900px) { .visual-grid { grid-template-columns: minmax(0, 1.35fr) minmax(230px, .85fr); } .side-column { gap: 10px; } .trend-panel, .selected-panel { padding: 13px; } .chart { height: 145px; } }
 @media (max-width: 680px) { .page { padding-top: 22px; }.intro-row { align-items: start; flex-direction: column; gap: 7px; }.controlbar { flex-wrap: wrap; gap: 9px; }.select-wrap { margin-left: 0; }.search-wrap { margin-left: auto; }.metrics { grid-template-columns: 1fr 1fr; }.metric:nth-child(2) { border-right: 0; }.metric:nth-child(-n+2) { border-bottom: 1px solid var(--pui-color-border-base); }.visual-grid { grid-template-columns: 1fr; }.side-column { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }.trend-panel, .selected-panel { min-height: 200px; }.table-scroll { padding: 0 8px; }.table-scroll th { padding-inline: 8px; }.table-scroll td { padding-inline: 8px; }.topbar-right { font-size: var(--pui-text-size-caption); }.segment-control { order: 2; flex: 1; }.basin-control { flex-wrap: nowrap; overflow-x: auto; }.filter-label { width: calc(100% - 8px); }.segment-control button { flex: 0 0 auto; padding-inline: 7px; }.analytics-grid { grid-template-columns: 1fr; }.track-analysis { grid-column: auto; }.track-mini-grid { grid-template-columns: 1fr; gap: 8px; }.climate-heading, .temperature-relationship-heading { align-items: start; flex-direction: column; }.temperature-relationship-grid { grid-template-columns: 1fr; }.temperature-chart-card:last-child { grid-column: auto; }.temperature-relationship-heading .metric-switch { align-self: stretch; }.temperature-relationship-heading .metric-switch button { flex: 1; }.climate-layout { grid-template-columns: 1fr; }.climate-trends { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }.metric-switch button { padding-inline: 6px; } }

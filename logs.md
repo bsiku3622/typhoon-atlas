@@ -1,3 +1,12 @@
+## 2026-10-31 — Add research status page
+
+- 변경 파일: `src/Research.tsx`, `src/main.tsx`, `src/App.tsx`, `src/styles.css`, `public/research/`, `README.md`
+- 요약: 텀프로젝트의 가설·진행 단계·결과를 `#research`에서 보여주는 현황 페이지를 추가했습니다. 내용은 `public/research/status.json` 하나로 관리합니다.
+
+연구 현황을 자주 갱신해야 하므로 내용을 코드에서 분리했습니다. JSON과 그림만 고쳐 main에 올리면 Vercel이 배포합니다. 현황 페이지가 지도용 대용량 CSV를 받지 않도록 `App` 안의 탭이 아니라 `main.tsx`의 해시 분기로 나눴습니다. 작업본은 `D:\Projects\Side Projects\typhoon-atlas`로 옮겼고, 맥북 작업본과 내용이 같던 미커밋 수정분과 `research/`, 분석 스크립트도 이번에 함께 커밋했습니다.
+
+Paper UI의 `Badge` 색은 `color`가 아니라 `accent`로 지정합니다. `color`도 HTML 속성이라 타입 오류 없이 통과하지만 색이 적용되지 않습니다. `App.tsx`의 기존 `color="warning"` 배지도 같은 상태이나 이번 범위가 아니어서 그대로 두었습니다. `dev`와 `dev/*`는 Git에서 동시에 존재할 수 없어 `dev` 하나만 쓰고 `dev → main`으로 병합합니다.
+
 ## 2026-10-31 — Consolidate cyclone research notes
 
 - 변경 파일: [연구 통합 정리](/Users/baeks/Reports/2026-10-31_19-18-wnp-typhoon-research-compendium.md); 다운로드 폴더의 Markdown 사본

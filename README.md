@@ -54,6 +54,10 @@ The exploratory observed-intensity analysis is saved in `research/step2-wnp-1980
 
 Reproduce with `python scripts/analyze_wnp_step2.py --ibtracs <raw.csv> --temperature <raw.nc> --output <directory>` after installing `scripts/requirements-analysis.txt`. Results include annual tables, HAC uncertainty estimates, linear-year-adjusted associations, sensitivity analyses, figures, and an input checksum manifest. The report is `research/step2-wnp-1980-2024/report.md`. Potential intensity has not yet been calculated.
 
+## Research status page
+
+[atlas.bsiku.dev/#research](https://atlas.bsiku.dev/#research) tracks the term project behind this viewer: hypotheses, progress, findings, tables, and figures. The page renders `public/research/status.json`, so updating research progress only requires editing that file and its figures. It loads none of the large track and climate CSVs. Entries are working records, not peer-reviewed results.
+
 ## Run
 
 ```sh
