@@ -1,0 +1,19 @@
+,value
+jma_records,57
+first_jma_time,2013-11-04 00:00:00
+last_jma_time,2013-11-11 00:00:00
+peak_time,2013-11-07 12:00:00
+peak_lat,10.2
+peak_lon,129.1
+peak_wind_kt,125.0
+peak_wind_ms,64.305
+min_pressure_hpa,895.0
+usa_peak_kt,170.0
+pi_at_peak_ms,75.85854638562493
+pi_normal_at_peak_ms,75.65221444608002
+ratio_at_peak,0.8476961801127486
+sst_at_peak_c,29.248483657836914
+sst_normal_at_peak_c,29.292829513549805
+max_24h_intensification_ms,20.577600000000004
+max_24h_time,2013-11-06 18:00:00
+box_pi_2013_11,68.15493530520544

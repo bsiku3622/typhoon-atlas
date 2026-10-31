@@ -1,3 +1,10 @@
+## 2026-11-01 — Add simulation and potential intensity research
+
+- 변경 파일: `research/README.md`, `research/results_ko.md`, `research/simulation/`, `research/pi/`, `research/case_haiyan/`, `public/research/`, `README.md`
+- 요약: RE87 수치실험, 재분석 PI 분석, 하이옌 사례의 코드와 결과 표·그림을 올리고 현황 페이지를 최종 결과로 갱신했습니다.
+
+모델 원본은 재배포하지 않고 Zenodo를 가리킵니다. 재분석 원본과 모델 출력은 용량이 커서 뺐고, 실험 입력 사운딩과 요약 표만 넣었습니다. 동일 입력의 재실행 결과가 바이트 단위로 같으므로 출력은 다시 만들 수 있습니다. 학교 제출용 포스터와 사전 계획 문서는 저장소에 넣지 않았습니다.
+
 ## 2026-10-31 — Add research status page
 
 - 변경 파일: `src/Research.tsx`, `src/main.tsx`, `src/App.tsx`, `src/styles.css`, `public/research/`, `README.md`

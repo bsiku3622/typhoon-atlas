@@ -52,7 +52,7 @@ The cyclone source CSV is expected at `~/Bufs/Codex Files/2026-09-28/ibtracs/ibt
 
 The exploratory observed-intensity analysis is saved in `research/step2-wnp-1980-2024/`. It uses JMA 10-minute winds from the original IBTrACS CSV, excludes spur tracks, and selects tropical-stage systems reaching 34 kt. Regional HadISDH air-temperature indices use the original 5-degree grid; the primary index retains only cells observed in every month. It is not SST or a complete ocean-basin temperature mean.
 
-Reproduce with `python scripts/analyze_wnp_step2.py --ibtracs <raw.csv> --temperature <raw.nc> --output <directory>` after installing `scripts/requirements-analysis.txt`. Results include annual tables, HAC uncertainty estimates, linear-year-adjusted associations, sensitivity analyses, figures, and an input checksum manifest. The report is `research/step2-wnp-1980-2024/report.md`. Potential intensity has not yet been calculated.
+Reproduce with `python scripts/analyze_wnp_step2.py --ibtracs <raw.csv> --temperature <raw.nc> --output <directory>` after installing `scripts/requirements-analysis.txt`. Results include annual tables, HAC uncertainty estimates, linear-year-adjusted associations, sensitivity analyses, figures, and an input checksum manifest. The report is `research/step2-wnp-1980-2024/report.md`. Potential intensity and the numerical experiments are described in [`research/README.md`](research/README.md).
 
 ## Research status page
 

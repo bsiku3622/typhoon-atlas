@@ -29,7 +29,7 @@ const TONE: Record<Tone, { label: string; accent?: "success" | "info" | "warning
   pending: { label: "예정" },
   blocked: { label: "막힘", accent: "error" },
   supported: { label: "지지", accent: "success" },
-  rejected: { label: "기각", accent: "error" },
+  rejected: { label: "지지되지 않음", accent: "warning" },
   inconclusive: { label: "판정 전" },
 };
 
