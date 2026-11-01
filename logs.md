@@ -1,3 +1,12 @@
+## 2026-11-01 — Measure noise for each condition
+
+- 변경 파일: `public/research/status.json`, `public/research/*.png`, `src/Simulation.tsx`, `research/README.md`, `research/results_ko.md`, `research/simulation/`
+- 요약: 9개 조건을 5회씩 반복한 잡음과 판정을 현황 페이지에 넣고, 온난화에 가까운 결과를 앞세웠습니다.
+
+"대기만 +2 K의 감소를 온난화하면 약해진다로 읽으면 안 되고, 같은 조건을 반복해 잡음을 먼저 재야 한다"는 지적을 받아 반영했습니다. T0 반복만으로는 부족했습니다. 비습 고정 T+2의 표준편차는 T0의 7배였고, 단일 실행끼리 83.3 대 83.8로 같아 보이던 습도 비교는 5회 평균에서 84.1 대 80.9가 되어 "같다"가 아니라 "구분되지 않음"으로 바꿨습니다. 뷰어는 조건마다 한 번의 실행을 보여 주므로 표의 5회 평균과 값이 조금 다릅니다.
+
+⚠️ "구분됨"은 내부 변동보다 크다는 뜻일 뿐입니다. 물리 설정이 바뀌면 T0 자체가 72.5–106.4 m/s로 움직입니다. 이 단서를 빼면 안 됩니다.
+
 ## 2026-11-01 — Add interactive simulation viewer
 
 - 변경 파일: `src/Simulation.tsx`, `src/main.tsx`, `src/App.tsx`, `src/Research.tsx`, `src/styles.css`, `public/research/sim/`, `README.md`

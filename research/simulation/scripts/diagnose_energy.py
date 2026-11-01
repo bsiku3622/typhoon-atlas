@@ -1,7 +1,7 @@
 """Diagnose air-sea energy exchange and outflow temperature from RE87 output fields.
 
 Usage: python -I diagnose_energy.py <simulation-dir> <output-csv> <case> [<case> ...]
-Uses one-day means saved every two days; files 04 to 06 (days 8, 10, 12) are averaged after the storm has matured.
+Uses one-day means saved every two days; files 04 to 06 (windows days 7-8, 9-10, 11-12) are averaged after the storm has matured.
 
 Layout: tconNN, pconNN and qconNN have one row per radius on the full grid. vconNN and uconNN have one
 row per height on the plotting grid. The enthalpy flux per unit density follows the model form

@@ -6,9 +6,12 @@ These are coursework records and have not been peer reviewed. They are condition
 
 ## Main findings
 
-- Warming only the atmosphere by 2 K weakens the simulated storm by 21.7%. Warming the sea too strengthens it by about 4.1% per kelvin. Changing physics settings or grid spacing keeps the sign and rough size (−21 to −26%, +5 to +10% at T+2).
-- Holding relative humidity or specific humidity fixed makes no detectable difference on the warm side.
-- Intensity across experiments follows the CAPE of a parcel saturated at the sea surface (r² 0.87) better than the initial air-sea enthalpy difference (r² 0.69). This reading came after seeing the results and was not tested separately.
+- When the sea and the atmosphere warm together, as they do under global warming, the simulated storm strengthens: +8.5 ± 1.3% at +2 K (95% interval) and +4.2 ± 0.2% per kelvin.
+- Warming only the atmosphere by 2 K weakens the storm by 20.9 ± 1.3%. This is a sensitivity experiment that separates causes. It is not a warming scenario and does not show that warming weakens typhoons.
+- Noise was measured first by running nine conditions five times each with boundary-layer offsets of ±0.01 and ±0.02 K. The standard deviation of mean intensity ranges from 0.39 to 3.30 m/s by condition. All eight changes above are distinguishable from it, but this noise is internal variability only and excludes physics uncertainty.
+- Changing physics settings or grid spacing keeps the sign and changes the size (+5 to +10%, −21 to −26% at T+2). Those settings were run once per condition.
+- Mean intensity with relative humidity fixed cannot be told apart from specific humidity fixed (+3.2 ± 4.0 m/s at +2 K).
+- Intensity across experiments follows the CAPE of a parcel saturated at the sea surface (r² 0.88) better than the initial air-sea enthalpy difference (r² 0.71). This reading came after seeing the results and was not tested separately.
 - Western North Pacific PI rose by 1.5 to 1.8 m/s per decade over 1980–2024, mostly through SST. The atmospheric contribution is negative but significant in only one of the two reanalyses.
 
 ## Contents
@@ -30,7 +33,11 @@ The model is the public Rotunno–Emanuel axisymmetric code ([Zenodo 10957526](h
 bash simulation/scripts/build.sh
 python simulation/scripts/make_experiments.py
 bash simulation/scripts/run_batch.sh 7 <case> [<case> ...]
+python simulation/scripts/make_repeats.py
+bash simulation/scripts/run_repeats.sh
 ```
+
+After the runs, write `results/run_summary_all.csv` with `analyze_runs.py`, then run `analyze_repeats.py` before `make_figures.py`.
 
 A 15-day run takes about 10 minutes on one core of a Ryzen 7 7800X3D, and repeating a run reproduces its output exactly. Grid sensitivity runs change `M` and `N` in the main program and in `DIFFUSE`. The double-resolution run also needs `TVRDIF(100)` in subroutine `CAPE` enlarged, because it overflows at 160 levels.
 

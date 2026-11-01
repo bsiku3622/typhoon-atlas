@@ -8,6 +8,7 @@ All predictors are computed from the initial sounding, so they carry no feedback
   vmaxth    the model's own potential intensity
 Experiments run with the moist-adiabatic design at standard physics. T-1 and T-2 with SST fixed are shown
 but flagged because they do not reach a steady state; peak intensity is the fairer target for them.
+Intensity is the mean over the members of a condition where repeats exist, and the single run elsewhere.
 """
 import sys
 from pathlib import Path
@@ -19,10 +20,11 @@ from tcpyPI import cape
 sim = Path(sys.argv[1])
 sys.path.insert(0, str(sim / "scripts"))
 import soundings as sd  # noqa: E402
+from members import load_runs, members  # noqa: E402
 
 out = Path(sys.argv[2])
 results = sim / "results"
-run = pd.read_csv(results / "run_summary.csv").set_index("case")
+run = load_runs(results)
 init = pd.read_csv(results / "initial_disequilibrium.csv").set_index("case")
 cases = [f"{p}_{d}_{s}" for p, s in (("ad", "sstfix"), ("ad", "sstup"), ("q", "sstfix")) for d in ("m2", "m1", "p1", "p2")] + ["t0"]
 rows = []
@@ -32,12 +34,11 @@ for case in cases:
     e = float(sd.es(np.array(s.sst)))
     rs = 0.622 * e / (1013.0 - e)
     value, _, _, _ = cape(s.sst + 273.15, rs, 1013.0, s.t[keep] + 273.15, s.r[keep] / 1000.0, s.p[keep], ascent_flag=0, ptop=50, miss_handle=1)
-    rows.append({"case": case, "sst": s.sst, "init_dk": init.loc[case, "init_dk_kj"], "cape_sat": float(value), "vmaxth": run.loc[case, "vmaxth"],
-                 "v_mean": run.loc[case, "v_mean_d8_15"], "v_peak": run.loc[case, "v_peak_24h"], "steady": not (case in ("ad_m2_sstfix", "ad_m1_sstfix", "q_m2_sstfix", "q_m1_sstfix"))})
+    frame = run.loc[members(case)]
+    rows.append({"case": case, "n": len(frame), "sst": s.sst, "init_dk": init.loc[case, "init_dk_kj"], "cape_sat": float(value), "vmaxth": frame.vmaxth.mean(),
+                 "v_mean": frame.v_mean_d8_15.mean(), "v_peak": frame.v_peak_24h.mean(), "v_peak_sd": frame.v_peak_24h.std() if len(frame) > 1 else 0.0,
+                 "steady": not (case in ("ad_m2_sstfix", "ad_m1_sstfix", "q_m2_sstfix", "q_m1_sstfix"))})
 table = pd.DataFrame(rows).set_index("case")
-members = ["t0", "t0_n1", "t0_n2", "t0_n3", "t0_n4"]
-table.loc["t0", "v_mean"] = run.loc[members, "v_mean_d8_15"].mean()
-table.loc["t0", "v_peak"] = run.loc[members, "v_peak_24h"].mean()
 table.to_csv(out)
 pd.set_option("display.width", 180, "display.float_format", lambda v: f"{v:.2f}")
 print(table.to_string())

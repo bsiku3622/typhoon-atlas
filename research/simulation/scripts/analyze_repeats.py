@@ -3,7 +3,9 @@
 Usage: python -I analyze_repeats.py <simulation-dir> <plot-style-dir>
 Every repeated condition has five members: the original run and four with tiny boundary-layer offsets.
 A change is "distinguishable" when the Welch 95% confidence interval of the difference from T0 excludes
-zero. This measures internal variability only, not model or physics uncertainty.
+zero. The ranges of the two sets of members are also compared, as a check that needs no distribution.
+This measures internal variability only, not model or physics uncertainty.
+Run this before make_figures.py.
 """
 import sys
 from pathlib import Path
@@ -60,6 +62,7 @@ for case, (sst, dt, humidity) in CONDITIONS.items():
             row[f"{short}_pct"] = 100 * diff / base[col].mean()
             row[f"{short}_pct_ci"] = 100 * margin / base[col].mean()
             row[f"{short}_distinct"] = abs(diff) > margin
+            row[f"{short}_ranges_overlap"] = not (values.min() > base[col].max() or values.max() < base[col].min())
     rows.append(row)
 table = pd.DataFrame(rows)
 table.to_csv(results / "repeat_statistics.csv", index=False)
@@ -69,7 +72,7 @@ humidity_rows = []
 for dt, a, b in ((1, "ad_p1_sstfix", "q_p1_sstfix"), (2, "ad_p2_sstfix", "q_p2_sstfix")):
     for col, short in METRICS.items():
         diff, margin = welch(run.loc[members(a), col].values, run.loc[members(b), col].values)
-        humidity_rows.append({"dT": dt, "metric": short, "rh_minus_q": diff, "ci": margin, "distinct": abs(diff) > margin})
+        humidity_rows.append({"dT": dt, "metric": short, "rh_mean": run.loc[members(a), col].mean(), "q_mean": run.loc[members(b), col].mean(), "rh_minus_q": diff, "ci": margin, "distinct": abs(diff) > margin})
 humidity = pd.DataFrame(humidity_rows)
 humidity.to_csv(results / "repeat_humidity_comparison.csv", index=False)
 
@@ -112,6 +115,7 @@ for ax, (sst, title) in zip(axes, order):
     ax.set_title(title, fontsize=10.5)
     ax.set_xticks([-2, -1, 0, 1, 2], ["–2 K", "–1 K", "기준", "+1 K", "+2 K"])
     ax.set_xlabel("온도 편차")
+axes[1].text(-1.75, 14.5, "빈 표시: 반복 없는 단일 실행의 PI와 최고 강도.\n정상 상태에 이르지 않아 8–15일 평균은 그리지 않았다.", fontsize=8, color=ps.INK2)
 axes[0].set_ylabel("기준 대비 변화 (%)")
 axes[0].legend(loc="upper left", fontsize=8.5)
 ps.save(fig, str(results / "sim_02_response"))
