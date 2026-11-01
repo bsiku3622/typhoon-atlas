@@ -59,7 +59,7 @@ export function ResearchPage() {
     <main className="atlas-shell">
       <header className="topbar">
         <a className="brand" href="#top"><span className="brand-mark"><Wind size={16} /></span> Cyclone Atlas</a>
-        <div className="topbar-right"><a className="topbar-link" href="#top"><ArrowLeft size={14} /> 지도로 돌아가기</a></div>
+        <div className="topbar-right"><a className="topbar-link" href="#simulation">시뮬레이션</a><a className="topbar-link" href="#top"><ArrowLeft size={14} /> 지도로 돌아가기</a></div>
       </header>
 
       <div className="page research-page">

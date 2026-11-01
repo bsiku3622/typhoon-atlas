@@ -1,3 +1,10 @@
+## 2026-11-01 — Add interactive simulation viewer
+
+- 변경 파일: `src/Simulation.tsx`, `src/main.tsx`, `src/App.tsx`, `src/Research.tsx`, `src/styles.css`, `public/research/sim/`, `README.md`
+- 요약: RE87 실행 5개를 나란히 재생하는 `#simulation` 페이지를 추가했습니다. 위에서 본 모습, 단면, 시계열이 시간에 맞춰 함께 움직입니다.
+
+위에서 본 모습의 입자는 최하층 접선풍과 방사풍의 실제 비율로 움직이지만 재생 속도는 보기 좋게 빠릅니다. 축대칭 모델이라 구름은 동심원이고 나선 띠는 없다는 점을 페이지에 밝혔습니다. 기본 비교는 기준과 바다·대기 +2 K입니다. 대기만 데운 실험은 온난화 시나리오로 오독되기 쉬워 민감도 실험이라고 표시했습니다. 6시간 평균 출력을 위해 `PLTIME=TAVE=0.25`로 다시 실행했고, `time.out`이 원 실험과 바이트 단위로 같아 같은 모의임을 확인했습니다. 자료는 값당 1바이트로 양자화해 실험당 약 0.57 MB이므로 툴팁 값의 정밀도는 약 0.6 m/s입니다.
+
 ## 2026-11-01 — Add simulation and potential intensity research
 
 - 변경 파일: `research/README.md`, `research/results_ko.md`, `research/simulation/`, `research/pi/`, `research/case_haiyan/`, `public/research/`, `README.md`

@@ -54,6 +54,10 @@ The exploratory observed-intensity analysis is saved in `research/step2-wnp-1980
 
 Reproduce with `python scripts/analyze_wnp_step2.py --ibtracs <raw.csv> --temperature <raw.nc> --output <directory>` after installing `scripts/requirements-analysis.txt`. Results include annual tables, HAC uncertainty estimates, linear-year-adjusted associations, sensitivity analyses, figures, and an input checksum manifest. The report is `research/step2-wnp-1980-2024/report.md`. Potential intensity and the numerical experiments are described in [`research/README.md`](research/README.md).
 
+## Simulation viewer
+
+[atlas.bsiku.dev/#simulation](https://atlas.bsiku.dev/#simulation) plays five Rotunno–Emanuel axisymmetric model runs side by side: a top-down view whose particles follow the model's lowest-level winds, a radius–height section of wind, cloud or temperature anomaly, and intensity over time. Data are six-hourly means in `public/research/sim/`, written by `research/simulation/scripts/export_viz.py`. Those runs differ from the experiments only in output frequency, and their `time.out` files are byte-identical. Because the model is axisymmetric, clouds form rings and there are no spiral bands, storm motion or ocean cooling.
+
 ## Research status page
 
 [atlas.bsiku.dev/#research](https://atlas.bsiku.dev/#research) tracks the term project behind this viewer: hypotheses, progress, findings, tables, and figures. The page renders `public/research/status.json`, so updating research progress only requires editing that file and its figures. It loads none of the large track and climate CSVs. Entries are working records, not peer-reviewed results.

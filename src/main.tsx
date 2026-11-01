@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { PaperProvider } from "@studio-baeks/paper-ui";
 import { App } from "./App";
 import { ResearchPage } from "./Research";
+import { SimulationPage } from "./Simulation";
 import "@studio-baeks/paper-ui/styles.css";
 import "./styles.css";
 
@@ -13,7 +14,9 @@ function Root() {
     window.addEventListener("hashchange", update);
     return () => window.removeEventListener("hashchange", update);
   }, []);
-  return hash === "#research" ? <ResearchPage /> : <App />;
+  if (hash === "#research") return <ResearchPage />;
+  if (hash === "#simulation") return <SimulationPage />;
+  return <App />;
 }
 
 createRoot(document.getElementById("root")!).render(
