@@ -50,12 +50,12 @@ export function PanelHeading({ title, caption, level = "heading", aside }: { tit
 
 export function Metric({ label, value, note }: { label: ReactNode; value: ReactNode; note: ReactNode }) {
   return (
-    <Panel padding="md">
+    <Box padding="md">
       <Stack gap="xs">
         <Text variant="caption" ink="secondary">{label}</Text>
         <Text variant="title" as="p" numeric>{value}</Text>
         <Text variant="caption" ink="tertiary">{note}</Text>
       </Stack>
-    </Panel>
+    </Box>
   );
 }

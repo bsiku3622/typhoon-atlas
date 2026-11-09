@@ -6,7 +6,7 @@ import { feature } from "topojson-client";
 import type { Feature, Geometry } from "geojson";
 import type { Topology, Objects } from "topojson-specification";
 import countries from "world-atlas/countries-110m.json";
-import { ExternalLink, Filter, Maximize2, Minus, Plus, Search } from "lucide-react";
+import { ExternalLink, Maximize2, Minus, Plus, Search } from "lucide-react";
 import { Badge, Box, Divider, Field, Grid, IconButton, Inline, Label, Link, SegmentControl, Select, Spinner, Stack, Surface, Text } from "@studio-baeks/paper-ui";
 import { tokens } from "@studio-baeks/paper-ui/tokens";
 import { Metric, Panel, PanelHeading, SourceBadge, TopBar } from "./chrome";
@@ -331,7 +331,7 @@ export function App() {
     <Stack as="main" minHeight="viewport">
       <TopBar links={[{ href: "#simulation", label: "시뮬레이션" }, { href: "#research", label: "연구 현황" }]} source={<><SourceBadge>NOAA IBTrACS v04r01</SourceBadge><Divider orientation="vertical" /><Text variant="caption" ink="secondary" as="span">Global · 1980–2026</Text></>} />
 
-      <Stack gap="xl" id="top" className="page" paddingX="xl" paddingY="xl" maxWidth="container.content" width="full">
+      <Stack gap="xl" id="top" className="page page-wide" paddingX="xl" paddingY="xl" width="full">
         <Inline justify="between" align="end" gap="lg" wrap as="section">
           <Stack gap="xs">
             <Text variant="title" as="h1">전 세계 열대저기압 아틀라스</Text>
@@ -340,27 +340,26 @@ export function App() {
           <Link href={DATA_SOURCE} target="_blank" rel="noreferrer" underline="hover"><Inline gap="xs" align="center"><Text variant="caption" as="span">데이터 출처</Text><ExternalLink size={14} aria-hidden /></Inline></Link>
         </Inline>
 
-        <Surface as="section" fill="raised" border radius="sm" padding="sm" aria-label="자료 필터">
-          <Inline gap="md" align="center" wrap>
-            <Inline gap="xs" align="center"><Filter size={15} aria-hidden /><Text variant="label" ink="secondary">범위</Text></Inline>
-            <Box className="basin-scroll" overflowX="auto"><SegmentControl size="sm" aria-label="해역 선택" value={basin} onValueChange={setBasin}>{["ALL", ...new Set(points.map((point) => point.basin))].map((code) => <SegmentControl.Item key={code} value={code}>{code === "ALL" ? "전 세계" : `${BASIN_LABELS[code] ?? "기타 해역"} (${code})`}</SegmentControl.Item>)}</SegmentControl></Box>
-            <Inline gap="sm" align="center" className="filter-end">
-              <Label htmlFor="season-select">연도</Label>
-              <Select className="select-fit" id="season-select" size="sm" value={season} onChange={(event) => { setSeason(event.target.value); setSelectedId(""); }}><Select.Option value="ALL">전체 연도</Select.Option>{seasons.map((year) => <Select.Option key={year} value={year}>{year}</Select.Option>)}</Select>
-              <Field size="sm" aria-label="태풍 이름 검색" placeholder="태풍 이름 검색" leading={<Search size={14} aria-hidden />} clearable value={query} onChange={(event) => setQuery(event.target.value)} onClear={() => setQuery("")} />
-            </Inline>
+        <Inline as="section" gap="md" align="center" wrap aria-label="자료 필터">
+          <Inline gap="sm" align="center">
+            <Label htmlFor="basin-select">해역</Label>
+            <Select className="select-basin" id="basin-select" size="sm" shape="rounded" value={basin} onChange={(event) => setBasin(event.target.value)}>{["ALL", ...new Set(points.map((point) => point.basin))].map((code) => <Select.Option key={code} value={code}>{code === "ALL" ? "전 세계" : `${BASIN_LABELS[code] ?? "기타 해역"} (${code})`}</Select.Option>)}</Select>
           </Inline>
-        </Surface>
+          <Inline gap="sm" align="center">
+            <Label htmlFor="season-select">연도</Label>
+            <Select className="select-fit" id="season-select" size="sm" value={season} onChange={(event) => { setSeason(event.target.value); setSelectedId(""); }}><Select.Option value="ALL">전체 연도</Select.Option>{seasons.map((year) => <Select.Option key={year} value={year}>{year}</Select.Option>)}</Select>
+          </Inline>
+          <Field className="filter-search" size="sm" aria-label="태풍 이름 검색" placeholder="태풍 이름 검색" leading={<Search size={14} aria-hidden />} clearable value={query} onChange={(event) => setQuery(event.target.value)} onClear={() => setQuery("")} />
+        </Inline>
 
         {loadError && <Surface fill="sunken" border radius="sm" padding="md" role="status"><Text variant="caption" ink="warning">{loadError}</Text></Surface>}
         {!points.length && !loadError && <Inline justify="center" align="center" gap="sm" minHeight="xl"><Spinner label="불러오는 중" /><Text variant="caption" ink="secondary">NOAA 태풍 경로 자료를 불러오는 중입니다…</Text></Inline>}
 
-        <Grid as="section" columns={{ base: 2, md: 4 }} gap="md" aria-label="선택 범위 요약">
+        <Surface as="section" fill="raised" border radius="sm" aria-label="선택 범위 요약" className="stat-band">
           <Metric label="열대저기압 수" value={storms.length ? visibleStorms.length.toLocaleString() : "—"} note={`${season === "ALL" ? "1980년 이후" : `${season}년`} · 고유 SID 기준`} />
           <Metric label="경로 관측점" value={points.length ? pointsInSeason.toLocaleString() : "—"} note="대체로 3–6시간 간격" />
           <Metric label="최대 풍속" value={peak ? formatWind(peak) : "—"} note="WMO 기준 · 최대 지속풍" />
-          <Metric label="해역 범위" value={basin === "ALL" ? "전 세계" : basin} note={basin === "ALL" ? "IBTrACS 전체 해역 코드" : "IBTrACS 해역 코드 기준"} />
-        </Grid>
+        </Surface>
 
         <Grid as="section" columns={{ base: 1, lg: "minmax(0, 1.7fr) minmax(16rem, .8fr)" }} gap="md" className="visual-grid">
           <Panel className="map-panel">

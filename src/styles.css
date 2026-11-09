@@ -1,11 +1,15 @@
-:root { color-scheme: light; }
+:root { color-scheme: light; --page-wide: 84rem; }
 body { min-width: 20rem; }
 
 .brand-mark { width: var(--pui-shape-control-height-xs); height: var(--pui-shape-control-height-xs); display: grid; place-items: center; border-radius: var(--pui-shape-radius-control-xs); background: var(--pui-color-ink-primary); color: var(--pui-color-bg-raised); }
 .page { margin-inline: auto; }
 
-.basin-scroll { flex: 1 1 0; min-width: 0; }
-.filter-end { margin-inline-start: auto; }
+.page-wide { max-width: var(--page-wide); }
+.select-basin { width: 11rem; }
+.filter-search { flex: 1 1 14rem; max-width: 20rem; }
+.stat-band { display: grid; grid-template-columns: minmax(0, 1fr); overflow: hidden; }
+.stat-band > * + * { border-top: var(--pui-shape-stroke-border) solid var(--pui-color-border-base); }
+@media (min-width: 40rem) { .stat-band { grid-template-columns: repeat(3, minmax(0, 1fr)); } .stat-band > * + * { border-top: 0; border-inline-start: var(--pui-shape-stroke-border) solid var(--pui-color-border-base); } }
 
 .map-panel { padding-bottom: 0; }
 .map-legend { white-space: nowrap; }

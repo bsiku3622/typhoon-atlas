@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@studio-baeks/paper-ui':
-        specifier: ^0.1.1
-        version: 0.1.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: ^0.1.2
+        version: 0.1.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       d3-geo:
         specifier: ^3.1.1
         version: 3.1.1
@@ -549,8 +549,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@studio-baeks/paper-ui@0.1.1':
-    resolution: {integrity: sha512-eBDKaFBOqUG7MVlXMKMbSc60YtSKQSb60iFvvKP4wLW2I3FwODRM0ifDLTMttbJz6xIKFtXrsKrpZekHZbQPVA==}
+  '@studio-baeks/paper-ui@0.1.2':
+    resolution: {integrity: sha512-C8FB9DIomdro9b1BHYx4fw6HJkQSUVYAP0ZTdUiQUgzSv6Uv2e9Vlu2kCI8MJyvmqSKBGW92tNfl/SKwkFayHA==}
     peerDependencies:
       react: ^18.2.0 || ^19.0.0
       react-dom: ^18.2.0 || ^19.0.0
@@ -1255,7 +1255,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.63.5':
     optional: true
 
-  '@studio-baeks/paper-ui@0.1.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@studio-baeks/paper-ui@0.1.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@react-aria/dnd': 3.12.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@react-aria/focus': 3.22.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
