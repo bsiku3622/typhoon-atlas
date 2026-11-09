@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, ExternalLink, Wind } from "lucide-react";
-import { Badge, Table, Text } from "@studio-baeks/paper-ui";
+import type { ReactNode } from "react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
+import { Badge, Box, Divider, Grid, Inline, Link, Stack, Text } from "@studio-baeks/paper-ui";
+import { Panel, PanelHeading, TopBar } from "./chrome";
 
 type Tone = "done" | "running" | "pending" | "blocked" | "supported" | "rejected" | "inconclusive";
 type Step = { id: string; title: string; status: Tone; detail: string };
@@ -55,84 +57,90 @@ export function ResearchPage() {
     return () => { active = false; };
   }, []);
 
+  const list = (items: { key: string; title: string; trailing: ReactNode; detail: string }[], ordered = true) => (
+    <Stack as={ordered ? "ol" : "ul"} gap="md" className="plain-list">
+      {items.map((item, index) => <li key={item.key}>
+        {index > 0 && <Divider />}
+        <Stack gap="xs" className="list-item">
+          {item.title && <Inline justify="between" align="start" gap="md" wrap><Text variant="body" strong as="span">{item.title}</Text>{item.trailing}</Inline>}
+          <Text variant="body" ink="secondary">{item.detail}</Text>
+        </Stack>
+      </li>)}
+    </Stack>
+  );
+
   return (
-    <main className="atlas-shell">
-      <header className="topbar">
-        <a className="brand" href="#top"><span className="brand-mark"><Wind size={16} /></span> Cyclone Atlas</a>
-        <div className="topbar-right"><a className="topbar-link" href="#simulation">시뮬레이션</a><a className="topbar-link" href="#top"><ArrowLeft size={14} /> 지도로 돌아가기</a></div>
-      </header>
+    <Stack as="main" minHeight="viewport">
+      <TopBar links={[{ href: "#simulation", label: "시뮬레이션" }, { href: "#top", label: <Inline gap="xs" align="center" as="span"><ArrowLeft size={14} aria-hidden />지도로 돌아가기</Inline> }]} />
 
-      <div className="page research-page">
-        {failed && <article className="panel research-panel"><Text variant="body">연구 현황을 불러오지 못했습니다.</Text></article>}
-        {!failed && !status && <article className="panel research-panel"><Text variant="body">연구 현황을 불러오는 중입니다.</Text></article>}
+      <Stack gap="md" className="page" paddingX="xl" paddingY="xl" maxWidth="container.content" width="full">
+        {failed && <Panel><Text variant="body">연구 현황을 불러오지 못했습니다.</Text></Panel>}
+        {!failed && !status && <Panel><Text variant="body">연구 현황을 불러오는 중입니다.</Text></Panel>}
         {status && <>
-          <section className="research-intro">
-            <span className="research-eyebrow">연구 현황 · {status.updatedAt} 기준</span>
-            <h1>{status.title}</h1>
-            <p>{status.summary}</p>
-            <p className="research-notice">{status.notice}</p>
-          </section>
+          <Stack as="section" gap="sm" maxWidth="measure.xl">
+            <Text variant="caption" ink="tertiary">연구 현황 · {status.updatedAt} 기준</Text>
+            <Text variant="title" as="h1">{status.title}</Text>
+            <Text variant="body" ink="secondary">{status.summary}</Text>
+            <Text variant="caption" ink="tertiary">{status.notice}</Text>
+          </Stack>
 
-          <section className="research-grid">
-            <article className="panel research-panel">
-              <div className="panel-heading"><div><Text variant="heading" as="h2">가설</Text><Text variant="caption">모델과 이론 계산으로 판정한다</Text></div></div>
-              <ol className="research-list">
-                {status.hypotheses.map((item) => <li key={item.id}>
-                  <div className="research-row"><strong>{item.id}. {item.statement}</strong><StatusBadge tone={item.status} /></div>
-                  <span>{item.evidence}</span>
-                </li>)}
-              </ol>
-            </article>
-            <article className="panel research-panel">
-              <div className="panel-heading"><div><Text variant="heading" as="h2">진행 단계</Text><Text variant="caption">사례 → 통계 → 모의 → 해석</Text></div></div>
-              <ol className="research-list">
-                {status.steps.map((item) => <li key={item.id}>
-                  <div className="research-row"><strong>{item.id}. {item.title}</strong><StatusBadge tone={item.status} /></div>
-                  <span>{item.detail}</span>
-                </li>)}
-              </ol>
-            </article>
-          </section>
+          <Grid as="section" columns={{ base: 1, md: 2 }} gap="md" align="start">
+            <Panel>
+              <Stack gap="md">
+                <PanelHeading title="가설" caption="모델과 이론 계산으로 판정한다" />
+                {list(status.hypotheses.map((item) => ({ key: item.id, title: `${item.id}. ${item.statement}`, trailing: <StatusBadge tone={item.status} />, detail: item.evidence })))}
+              </Stack>
+            </Panel>
+            <Panel>
+              <Stack gap="md">
+                <PanelHeading title="진행 단계" caption="사례 → 통계 → 모의 → 해석" />
+                {list(status.steps.map((item) => ({ key: item.id, title: `${item.id}. ${item.title}`, trailing: <StatusBadge tone={item.status} />, detail: item.detail })))}
+              </Stack>
+            </Panel>
+          </Grid>
 
-          <section className="panel research-panel">
-            <div className="panel-heading"><div><Text variant="heading" as="h2">확인한 결과</Text><Text variant="caption">최근 순서 · 근거의 종류를 함께 표시</Text></div></div>
-            <ul className="research-list">
-              {status.findings.map((item) => <li key={`${item.date}-${item.title}`}>
-                <div className="research-row"><strong>{item.title}</strong><span className="research-kind">{item.date} · {item.kind}</span></div>
-                <span>{item.detail}</span>
-              </li>)}
-            </ul>
-          </section>
+          <Panel as="section">
+            <Stack gap="md">
+              <PanelHeading title="확인한 결과" caption="최근 순서 · 근거의 종류를 함께 표시" />
+              {list(status.findings.map((item) => ({ key: `${item.date}-${item.title}`, title: item.title, trailing: <Text variant="caption" ink="tertiary" as="span">{item.date} · {item.kind}</Text>, detail: item.detail })), false)}
+            </Stack>
+          </Panel>
 
-          {status.tables.map((table) => <section className="panel research-panel" key={table.title}>
-            <div className="panel-heading"><div><Text variant="heading" as="h2">{table.title}</Text><Text variant="caption">{table.caption}</Text></div></div>
-            <div className="research-table">
-              <Table>
-                <Table.Header>{table.columns.map((column, index) => <Table.Column key={column} align={index === 0 ? undefined : "end"}>{column}</Table.Column>)}</Table.Header>
-                <Table.Body>{table.rows.map((row) => <Table.Row key={String(row[0])}>
-                  {row.map((cell, index) => <Table.Cell key={index} align={index === 0 ? undefined : "end"}>{cell}</Table.Cell>)}
-                </Table.Row>)}</Table.Body>
-              </Table>
-            </div>
-          </section>)}
+          {status.tables.map((table) => <Panel as="section" key={table.title}>
+            <Stack gap="md">
+              <PanelHeading title={table.title} caption={table.caption} />
+              <Box overflowX="auto">
+                <table className="data-table">
+                  <thead><tr>{table.columns.map((column, index) => <th key={column} className={index === 0 ? undefined : "end"}>{column}</th>)}</tr></thead>
+                  <tbody>{table.rows.map((row) => <tr key={String(row[0])}>
+                    {row.map((cell, index) => <td key={index} className={index === 0 ? undefined : "end"}>{cell}</td>)}
+                  </tr>)}</tbody>
+                </table>
+              </Box>
+            </Stack>
+          </Panel>)}
 
-          {status.figures.length > 0 && <section className="research-figures">
-            {status.figures.map((figure) => <figure className="panel research-panel" key={figure.src}>
-              <a href={figure.src} target="_blank" rel="noreferrer"><img src={figure.src} alt={figure.title} loading="lazy" /></a>
-              <figcaption><strong>{figure.title}</strong><span>{figure.caption}</span></figcaption>
-            </figure>)}
-          </section>}
+          {status.figures.length > 0 && <Grid as="section" columns={{ base: 1, md: 2 }} gap="md">
+            {status.figures.map((figure) => <Panel as="figure" className="figure-panel" key={figure.src}>
+              <Stack gap="sm">
+                <Link href={figure.src} target="_blank" rel="noreferrer"><img className="research-figure" src={figure.src} alt={figure.title} loading="lazy" /></Link>
+                <Stack as="figcaption" gap="xs"><Text variant="body" strong as="span">{figure.title}</Text><Text variant="caption" ink="secondary" as="span">{figure.caption}</Text></Stack>
+              </Stack>
+            </Panel>)}
+          </Grid>}
 
-          <section className="panel research-panel">
-            <div className="panel-heading"><div><Text variant="heading" as="h2">해석할 때 주의할 점</Text></div></div>
-            <ul className="research-list research-caveats">{status.caveats.map((item) => <li key={item}><span>{item}</span></li>)}</ul>
-          </section>
+          <Panel as="section">
+            <Stack gap="md">
+              <PanelHeading title="해석할 때 주의할 점" />
+              {list(status.caveats.map((item) => ({ key: item, title: "", trailing: null, detail: item })), false)}
+            </Stack>
+          </Panel>
 
-          <footer className="footer">
-            {status.links.map((link) => <a key={link.href} href={link.href} target="_blank" rel="noreferrer">{link.label} <ExternalLink size={12} /></a>)}
-          </footer>
+          <Inline as="footer" gap="md" wrap>
+            {status.links.map((link) => <Link key={link.href} href={link.href} target="_blank" rel="noreferrer" underline="hover"><Inline gap="xs" align="center"><Text variant="caption" as="span">{link.label}</Text><ExternalLink size={12} aria-hidden /></Inline></Link>)}
+          </Inline>
         </>}
-      </div>
-    </main>
+      </Stack>
+    </Stack>
   );
 }

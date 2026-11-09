@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ExternalLink, Pause, Play, Wind } from "lucide-react";
+import { ExternalLink, Pause, Play } from "lucide-react";
+import { Grid, IconButton, Inline, Link, SegmentControl, Select, Slider, Stack, Surface, Text } from "@studio-baeks/paper-ui";
+import { Panel, PanelHeading, TopBar } from "./chrome";
 
 type CaseInfo = { id: string; label: string; note: string; dT: number; sst: number; pi: number; hours: number[]; vmax: number[]; pmin: number[]; rmw: number[] };
 type FieldKey = "v" | "u" | "w" | "q" | "t";
@@ -292,7 +294,7 @@ function SectionView({ index, data, field, frame, label }: { index: SimIndex; da
       }
     }
     // Axes
-    const ink = getComputedStyle(canvas).getPropertyValue("--sim-axis") || "#55544f";
+    const ink = getComputedStyle(canvas).getPropertyValue("--sim-axis") || "currentcolor";
     ctx.fillStyle = ink;
     ctx.strokeStyle = ink;
     ctx.font = "11px Pretendard Variable, sans-serif";
@@ -335,7 +337,7 @@ function SectionView({ index, data, field, frame, label }: { index: SimIndex; da
   return (
     <div className="sim-section-wrap">
       <canvas ref={canvasRef} className="sim-section" role="img" aria-label={`${label}: ${FIELD_UI[field].label} 단면`} onPointerMove={onMove} onPointerLeave={() => setTip(null)} />
-      {tip && <div className="sim-tip" style={{ left: `${tip.x}%`, top: `${tip.y}%` }}>{tip.text}</div>}
+      {tip && <Surface theme="inverse" fill="raised" radius="sm" paddingX="sm" paddingY="xs" className="sim-tip" style={{ left: `${tip.x}%`, top: `${tip.y}%` }}><Text variant="caption" as="span">{tip.text}</Text></Surface>}
     </div>
   );
 }
@@ -344,14 +346,14 @@ function ColorBar({ field }: { field: FieldKey }) {
   const ui = FIELD_UI[field];
   const middle = (ui.range[0] + ui.range[1]) / 2;
   return (
-    <div className="sim-colorbar">
-      <span className="sim-colorbar-title">{ui.label} ({ui.unit})</span>
-      <div className="sim-colorbar-scale">
+    <Inline gap="md" align="center" wrap>
+      <Text variant="caption" strong as="span">{ui.label} ({ui.unit})</Text>
+      <Stack gap="xs" className="sim-colorbar-scale">
         <i style={{ background: `linear-gradient(90deg, ${ui.stops.join(",")})` }} />
-        <span className="sim-colorbar-ticks"><b>{ui.range[0]}</b><b>{middle}</b><b>{ui.range[1]}</b></span>
-      </div>
-      <span className="sim-colorbar-hint">{ui.hint}</span>
-    </div>
+        <Inline justify="between"><Text variant="label" ink="secondary" numeric as="span">{ui.range[0]}</Text><Text variant="label" ink="secondary" numeric as="span">{middle}</Text><Text variant="label" ink="secondary" numeric as="span">{ui.range[1]}</Text></Inline>
+      </Stack>
+      <Text variant="caption" ink="secondary" as="span">{ui.hint}</Text>
+    </Inline>
   );
 }
 
@@ -477,78 +479,84 @@ export function SimulationPage() {
   };
 
   return (
-    <main className="atlas-shell">
-      <header className="topbar">
-        <a className="brand" href="#top"><span className="brand-mark"><Wind size={16} /></span> Cyclone Atlas</a>
-        <nav className="topbar-right"><a className="topbar-link" href="#top">지도</a><span className="topbar-divider" /><a className="topbar-link" href="#research">연구 현황</a></nav>
-      </header>
-      <div className="page sim-page">
-        <section className="sim-intro">
-          <h1>모의 태풍을 비교해 보기</h1>
-          <p>약한 소용돌이가 15일 동안 태풍으로 자라는 과정을 Rotunno–Emanuel(1987) 축대칭 모델로 계산한 결과입니다. 두 실험을 나란히 놓고 시간을 움직여 보세요.</p>
-        </section>
+    <Stack as="main" minHeight="viewport">
+      <TopBar links={[{ href: "#top", label: "지도" }, { href: "#research", label: "연구 현황" }]} />
+      <Stack gap="md" className="page sim-page" paddingX="xl" paddingY="xl" maxWidth="container.content" width="full">
+        <Stack as="section" gap="sm" maxWidth="measure.xl">
+          <Text variant="title" as="h1">모의 태풍을 비교해 보기</Text>
+          <Text variant="body" ink="secondary">약한 소용돌이가 15일 동안 태풍으로 자라는 과정을 Rotunno–Emanuel(1987) 축대칭 모델로 계산한 결과입니다. 두 실험을 나란히 놓고 시간을 움직여 보세요.</Text>
+        </Stack>
 
-        {failed && <p className="sim-message">시뮬레이션 자료를 불러오지 못했습니다. 페이지를 새로 고쳐 주세요.</p>}
-        {!failed && !index && <p className="sim-message">시뮬레이션 자료를 불러오는 중입니다.</p>}
+        {failed && <Text variant="body" ink="secondary">시뮬레이션 자료를 불러오지 못했습니다. 페이지를 새로 고쳐 주세요.</Text>}
+        {!failed && !index && <Text variant="body" ink="secondary">시뮬레이션 자료를 불러오는 중입니다.</Text>}
 
         {index && left && right && <>
-          <div className="sim-controls">
-            <button type="button" className="sim-play" onClick={togglePlay} aria-label={playing ? "일시 정지" : "재생"}>{playing ? <Pause size={18} /> : <Play size={18} />}</button>
-            <label className="sim-slider">
-              <span>{(hour / 24).toFixed(1)}일</span>
-              <input type="range" min={0} max={index.frames - 1} step={0.01} value={frame} aria-label="모의 시간" onChange={(event) => { setPlaying(false); setFrame(Number(event.target.value)); }} />
-            </label>
-            <div className="sim-fields" role="group" aria-label="단면에 표시할 값">
-              {FIELD_ORDER.map((key) => <button type="button" key={key} className={field === key ? "active" : ""} aria-pressed={field === key} onClick={() => setField(key)}>{FIELD_UI[key].label}</button>)}
-            </div>
-          </div>
+          <Surface fill="raised" border radius="sm" elevation="sticky" top="sm" padding="sm">
+            <Inline gap="md" align="center" wrap>
+              <IconButton variant="solid" size="md" shape="pill" onClick={togglePlay} aria-label={playing ? "일시 정지" : "재생"}>{playing ? <Pause /> : <Play />}</IconButton>
+              <Inline gap="sm" align="center" className="sim-slider">
+                <Text variant="body" strong numeric as="span" className="sim-time">{(hour / 24).toFixed(1)}일</Text>
+                <Slider min={0} max={index.frames - 1} step={0.01} value={frame} aria-label="모의 시간" onChange={(event) => { setPlaying(false); setFrame(Number(event.target.value)); }} />
+              </Inline>
+              <SegmentControl size="sm" aria-label="단면에 표시할 값" value={field} onValueChange={(value) => setField(value as FieldKey)}>
+                {FIELD_ORDER.map((key) => <SegmentControl.Item key={key} value={key}>{FIELD_UI[key].label}</SegmentControl.Item>)}
+              </SegmentControl>
+            </Inline>
+          </Surface>
 
-          <div className="sim-stage">
+          <Grid columns={{ base: 1, md: 2 }} gap="md">
             {[{ id: leftId, set: setLeftId, info: left, tone: "a" }, { id: rightId, set: setRightId, info: right, tone: "b" }].map((side) => {
               const read = nearestSeries(side.info, hour);
               return (
-                <article className="sim-column" key={side.tone}>
-                  <div className="sim-column-head">
-                    <label>
+                <Stack as="article" gap="md" key={side.tone} minWidth={0}>
+                  <Stack gap="xs">
+                    <Inline gap="sm" align="center">
                       <i className={`swatch ${side.tone}`} />
-                      <select value={side.id} aria-label="실험 선택" onChange={(event) => side.set(event.target.value)}>
-                        {index.cases.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-                      </select>
-                    </label>
-                    <p>{side.info.note}</p>
-                  </div>
-                  <dl className="sim-readout">
-                    <div><dt>최대 풍속</dt><dd>{read.vmax.toFixed(0)}<small>m/s</small></dd></div>
-                    <div><dt>중심기압</dt><dd>{read.pmin.toFixed(0)}<small>hPa</small></dd></div>
-                    <div><dt>최대풍 반경</dt><dd>{read.rmw.toFixed(0)}<small>km</small></dd></div>
-                  </dl>
+                      <Select size="md" value={side.id} aria-label="실험 선택" onChange={(event) => side.set(event.target.value)}>
+                        {index.cases.map((item) => <Select.Option key={item.id} value={item.id}>{item.label}</Select.Option>)}
+                      </Select>
+                    </Inline>
+                    <Text variant="caption" ink="tertiary" className="sim-note">{side.info.note}</Text>
+                  </Stack>
+                  <Grid columns={3} gap="sm" as="dl" className="sim-readout">
+                    <div><Text variant="caption" ink="tertiary" as="dt">최대 풍속</Text><Text variant="title" numeric as="dd">{read.vmax.toFixed(0)}<Text variant="caption" ink="secondary" as="small">m/s</Text></Text></div>
+                    <div><Text variant="caption" ink="tertiary" as="dt">중심기압</Text><Text variant="title" numeric as="dd">{read.pmin.toFixed(0)}<Text variant="caption" ink="secondary" as="small">hPa</Text></Text></div>
+                    <div><Text variant="caption" ink="tertiary" as="dt">최대풍 반경</Text><Text variant="title" numeric as="dd">{read.rmw.toFixed(0)}<Text variant="caption" ink="secondary" as="small">km</Text></Text></div>
+                  </Grid>
                   <PlanView index={index} data={store[side.id] ?? null} frameRef={frameRef} label={side.info.label} reduced={reduced} />
                   <SectionView index={index} data={store[side.id] ?? null} field={field} frame={frame} label={side.info.label} />
-                </article>
+                </Stack>
               );
             })}
-          </div>
+          </Grid>
           <ColorBar field={field} />
 
-          <section className="sim-panel">
-            <h2>시간에 따른 강도</h2>
-            <TimeChart a={left} b={right} hour={hour} onSeek={(value) => { setPlaying(false); setFrame(toFrame(value)); }} />
-          </section>
+          <Panel as="section">
+            <Stack gap="md">
+              <PanelHeading title="시간에 따른 강도" />
+              <TimeChart a={left} b={right} hour={hour} onSeek={(value) => { setPlaying(false); setFrame(toFrame(value)); }} />
+            </Stack>
+          </Panel>
 
-          <section className="sim-notes">
-            <h2>보는 법과 주의할 점</h2>
-            <ul>
-              <li>위 그림의 입자는 모델의 최하층 바람으로 움직이고, 흰 부분은 응결한 물의 양을 나타냅니다. 움직임은 잘 보이도록 빠르게 재생합니다.</li>
-              <li>축대칭 모델이라 모든 값이 중심에 대해 대칭입니다. 나선형 구름 띠, 태풍의 이동, 해양 냉각은 모델에 없습니다.</li>
-              <li>풍속은 격자점의 순간값이어서 실제 태풍의 10분 평균 풍속과 비교할 수 없습니다. 절댓값보다 실험 간 차이를 보세요.</li>
-              <li><b>온난화와 가까운 실험은 "바다와 대기 +2 K"입니다.</b> "대기만" 실험은 원인을 나누어 보기 위한 민감도 실험이므로, 온난화하면 태풍이 약해진다는 뜻으로 읽으면 안 됩니다.</li>
-              <li>각 실험은 한 번의 실행입니다. 같은 조건을 5회 반복하면 8–15일 평균 강도의 표준편차는 조건에 따라 0.4~3.3 m/s이고, "바다와 대기 +2 K"(+8.5 ± 1.3%)와 "대기만 +2 K"(−20.9 ± 1.3%)의 변화는 이 잡음과 구분됩니다.</li>
-              <li>"대기만 −2 K"는 정상 상태에 이르지 않고 정점 이후 환경이 크게 변합니다.</li>
-            </ul>
-            <p className="sim-links"><a href="#research">연구 결과 보기</a><a href="https://zenodo.org/records/10957526" target="_blank" rel="noreferrer">모델 코드 <ExternalLink size={12} /></a></p>
-          </section>
+          <Panel as="section">
+            <Stack gap="md">
+              <PanelHeading title="보는 법과 주의할 점" />
+              <Stack as="ul" gap="sm" className="sim-notes-list">
+              <li><Text variant="body" ink="secondary" as="span">위 그림의 입자는 모델의 최하층 바람으로 움직이고, 흰 부분은 응결한 물의 양을 나타냅니다. 움직임은 잘 보이도록 빠르게 재생합니다.</Text></li>
+              <li><Text variant="body" ink="secondary" as="span">축대칭 모델이라 모든 값이 중심에 대해 대칭입니다. 나선형 구름 띠, 태풍의 이동, 해양 냉각은 모델에 없습니다.</Text></li>
+              <li><Text variant="body" ink="secondary" as="span">풍속은 격자점의 순간값이어서 실제 태풍의 10분 평균 풍속과 비교할 수 없습니다. 절댓값보다 실험 간 차이를 보세요.</Text></li>
+              <li><Text variant="body" ink="secondary" as="span"><Text variant="body" strong ink="primary" as="b">온난화와 가까운 실험은 "바다와 대기 +2 K"입니다.</Text> "대기만" 실험은 원인을 나누어 보기 위한 민감도 실험이므로, 온난화하면 태풍이 약해진다는 뜻으로 읽으면 안 됩니다.</Text></li>
+              <li><Text variant="body" ink="secondary" as="span">각 실험은 한 번의 실행입니다. 같은 조건을 5회 반복하면 8–15일 평균 강도의 표준편차는 조건에 따라 0.4~3.3 m/s이고, "바다와 대기 +2 K"(+8.5 ± 1.3%)와 "대기만 +2 K"(−20.9 ± 1.3%)의 변화는 이 잡음과 구분됩니다.</Text></li>
+              <li><Text variant="body" ink="secondary" as="span">"대기만 −2 K"는 정상 상태에 이르지 않고 정점 이후 환경이 크게 변합니다.</Text></li>
+              </Stack>
+              <Inline gap="lg" wrap>
+                <Link href="#research" underline="hover"><Text variant="caption" as="span">연구 결과 보기</Text></Link>
+                <Link href="https://zenodo.org/records/10957526" target="_blank" rel="noreferrer" underline="hover"><Inline gap="xs" align="center"><Text variant="caption" as="span">모델 코드</Text><ExternalLink size={12} aria-hidden /></Inline></Link>
+              </Inline>
+            </Stack>
+          </Panel>
         </>}
-      </div>
-    </main>
+      </Stack>
+    </Stack>
   );
 }
