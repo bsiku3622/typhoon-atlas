@@ -7,7 +7,7 @@ import type { Feature, Geometry } from "geojson";
 import type { Topology, Objects } from "topojson-specification";
 import countries from "world-atlas/countries-110m.json";
 import { ExternalLink, Maximize2, Minus, Plus, Search } from "lucide-react";
-import { Badge, Box, Divider, Field, Grid, IconButton, Inline, Label, Link, SegmentControl, Select, Spinner, Stack, Surface, Text } from "@studio-baeks/paper-ui";
+import { Badge, Divider, Field, Grid, IconButton, Inline, Label, Link, SegmentControl, Select, Spinner, Stack, Surface, Text } from "@studio-baeks/paper-ui";
 import { tokens } from "@studio-baeks/paper-ui/tokens";
 import { Metric, Panel, PanelHeading, SourceBadge, TopBar } from "./chrome";
 
@@ -32,13 +32,51 @@ function ZoomableSvg({ className, ariaLabel, children }: { className: string; ar
     return clampView({ scale: nextScale, x: x - (x - current.x) * nextScale / current.scale, y: y - (y - current.y) * nextScale / current.scale });
   });
   const zoomBy = (factor: number) => zoomAt(view.scale * factor, 410, 230);
+  const scaleRef = useRef(1);
+  scaleRef.current = view.scale;
+
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const toMap = (clientX: number, clientY: number) => {
+      const bounds = svg.getBoundingClientRect();
+      return { x: (clientX - bounds.left) / bounds.width * 820, y: (clientY - bounds.top) / bounds.height * 460, unit: 820 / bounds.width };
+    };
+    const onWheel = (event: WheelEvent) => {
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault();
+        const at = toMap(event.clientX, event.clientY);
+        zoomAt(scaleRef.current * Math.exp(-clamp(event.deltaY, -30, 30) * 0.01), at.x, at.y);
+      } else if (document.activeElement === svg) {
+        event.preventDefault();
+        const { unit } = toMap(0, 0);
+        setView((current) => clampView({ ...current, x: current.x - event.deltaX * unit, y: current.y - event.deltaY * unit }));
+      }
+    };
+    let startScale = 1;
+    const onGestureStart = (event: Event) => { event.preventDefault(); startScale = scaleRef.current; };
+    const onGestureChange = (event: Event) => {
+      event.preventDefault();
+      const gesture = event as Event & { scale: number; clientX: number; clientY: number };
+      const at = toMap(gesture.clientX, gesture.clientY);
+      zoomAt(startScale * gesture.scale, at.x, at.y);
+    };
+    svg.addEventListener("wheel", onWheel, { passive: false });
+    svg.addEventListener("gesturestart", onGestureStart);
+    svg.addEventListener("gesturechange", onGestureChange);
+    return () => {
+      svg.removeEventListener("wheel", onWheel);
+      svg.removeEventListener("gesturestart", onGestureStart);
+      svg.removeEventListener("gesturechange", onGestureChange);
+    };
+  }, []);
 
   return <div className="zoomable-map">
-    <div className="map-zoom-controls" role="group" aria-label="지도 확대 및 이동">
-      <IconButton variant="hairline" size="xs" aria-label="지도 확대" title="확대" onClick={() => zoomBy(1.35)}><Plus /></IconButton>
-      <IconButton variant="hairline" size="xs" aria-label="지도 축소" title="축소" onClick={() => zoomBy(1 / 1.35)}><Minus /></IconButton>
-      <IconButton variant="hairline" size="xs" aria-label="지도 초기화" title="초기화" onClick={() => setView({ scale: 1, x: 0, y: 0 })}><Maximize2 /></IconButton>
-    </div>
+    <Surface fill="raised" border radius="sm" shadow padding="xs" className="map-zoom-controls" role="group" aria-label="지도 확대 및 이동">
+      <IconButton variant="ghost" shape="rounded" size="xs" aria-label="지도 확대" title="확대" onClick={() => zoomBy(1.35)}><Plus /></IconButton>
+      <IconButton variant="ghost" shape="rounded" size="xs" aria-label="지도 축소" title="축소" onClick={() => zoomBy(1 / 1.35)}><Minus /></IconButton>
+      <IconButton variant="ghost" shape="rounded" size="xs" aria-label="지도 초기화" title="초기화" onClick={() => setView({ scale: 1, x: 0, y: 0 })}><Maximize2 /></IconButton>
+    </Surface>
     <svg ref={svgRef} className={className} viewBox="0 0 820 460" role="img" aria-label={ariaLabel} tabIndex={0}
       onKeyDown={(event) => {
         if (!event.metaKey && !event.ctrlKey) return;
@@ -415,8 +453,7 @@ export function App() {
             <Panel><PanelHeading level="subheading" title="평균·최대 풍속" caption="태풍별 WMO 최대 풍속의 연간 평균과 최댓값" />
               <LineChart years={analytics.years} label="연도별 태풍 최대 풍속 평균과 최댓값" unit="kt" series={[{ name: "평균", color: PUI.info, values: analytics.windByYear.map((item) => item.mean) }, { name: "최대", color: PUI.error, values: analytics.windByYear.map((item) => item.max) }]} />
             </Panel>
-            <Panel><PanelHeading level="subheading" title="강한 태풍 빈도" caption="태풍별 최대 풍속이 기준 이상인 연간 개수" />
-              <Box className="threshold-control"><SegmentControl size="xs" aria-label="풍속 기준 선택" value={String(windThreshold)} onValueChange={(value) => setWindThreshold(Number(value))}>{[34, 64, 96].map((threshold) => <SegmentControl.Item key={threshold} value={String(threshold)}>{threshold}+ kt</SegmentControl.Item>)}</SegmentControl></Box>
+            <Panel><PanelHeading level="subheading" title="강한 태풍 빈도" caption="태풍별 최대 풍속이 기준 이상인 연간 개수" aside={<SegmentControl size="xs" aria-label="풍속 기준 선택" value={String(windThreshold)} onValueChange={(value) => setWindThreshold(Number(value))}>{[34, 64, 96].map((threshold) => <SegmentControl.Item key={threshold} value={String(threshold)}>{threshold}+ kt</SegmentControl.Item>)}</SegmentControl>} />
               <div className="threshold-chart">{analytics.windByYear.map((item) => { const max = Math.max(1, ...analytics.windByYear.map((row) => row.threshold)); return <div key={item.year} className="threshold-column" title={`${item.year}: ${item.threshold}개`}><i style={{ height: `${Math.max(2, item.threshold / max * 100)}%` }} /><span>{item.year % 10 === 0 || item.year === analytics.years.at(-1) ? String(item.year).slice(-2) : ""}</span></div>; })}</div>
               <Inline justify="between" className="chart-axis"><Text variant="label" ink="tertiary" as="span">{analytics.years[0] ?? "—"}</Text><Text variant="label" ink="tertiary" as="span">{windThreshold} kt 이상 · 태풍 수</Text><Text variant="label" ink="tertiary" as="span">{analytics.years.at(-1) ?? "—"}</Text></Inline>
             </Panel>
@@ -477,7 +514,7 @@ export function App() {
           {visibleStorms.length > 100 && <Text variant="caption" ink="tertiary" as="p" className="table-more">목록에는 최신순 100개만 표시합니다. 연도나 해역 필터로 좁혀보세요.</Text>}
         </Panel>
 
-        <Stack as="footer" gap="sm">
+        <Stack as="footer" gap="md">
           <Inline gap="md" align="center" wrap>
             {[["Storms: NOAA NCEI · IBTrACS v04r01", DATA_SOURCE, "태풍 자료 설명"], ["Climate: Met Office · HadISDH.blend 1.5.1.2024f", HUMIDITY_SOURCE, "기후 자료 설명"], ["Upper air: NOAA PSL · NCEP/NCAR Reanalysis 1", CLIMATE_SOURCE, "상층 자료 설명"]].map(([text, href, label]) => <Inline key={href} gap="sm" align="center"><Text variant="caption" ink="tertiary" as="span">{text}</Text><Link href={href} target="_blank" rel="noreferrer" underline="hover"><Inline gap="xs" align="center"><Text variant="caption" as="span">{label}</Text><ExternalLink size={12} aria-hidden /></Inline></Link></Inline>)}
           </Inline>
