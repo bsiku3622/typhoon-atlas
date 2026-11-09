@@ -6,3 +6,4 @@ dist
 *.tsbuildinfo
 .env*
 !.env.example
+logs.md
