@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@studio-baeks/paper-ui':
-        specifier: ^0.1.2
-        version: 0.1.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: ^0.1.4
+        version: 0.1.4(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       d3-geo:
         specifier: ^3.1.1
         version: 3.1.1
@@ -355,6 +355,12 @@ packages:
     os: [linux]
     libc: [glibc]
 
+  '@react-aria/calendar@3.10.1':
+    resolution: {integrity: sha512-0QYoKYyCHFVvfOlXgftTzDttTXtbnYa0GQ6i970Rjdx/0VrMdJe2TXSm60OEISwB3w0aZWAnn3CBiDVtOYQtEw==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
+      react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
+
   '@react-aria/dnd@3.12.1':
     resolution: {integrity: sha512-gAFsHChr2K9enfTOyY3h+7c+hb8fM7GGSWRlcE63If+jrdBRPicQ0wyiRr1ChFU3KVH3Nk2PZUUMET58QlUYVQ==}
     peerDependencies:
@@ -399,6 +405,12 @@ packages:
 
   '@react-aria/visually-hidden@3.9.1':
     resolution: {integrity: sha512-PWuth+NTmUiBJAIyrfk7dJ5BxOBupDt0iFGlBiYr5FElSYvwN9LAk1kgkzm6hT2qzq4FmYdQgBSPkGeaxOui6w==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
+      react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
+
+  '@react-stately/calendar@3.10.1':
+    resolution: {integrity: sha512-nKluH+UT9xJlAimOW6ZrXgQNDiFUfbdtQwQ6rmq5mXs7yD8hGpOOLxJ0ZtT+cyWkbOAYR19j/6xyRPzGQxRL9g==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
       react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
@@ -549,8 +561,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@studio-baeks/paper-ui@0.1.2':
-    resolution: {integrity: sha512-C8FB9DIomdro9b1BHYx4fw6HJkQSUVYAP0ZTdUiQUgzSv6Uv2e9Vlu2kCI8MJyvmqSKBGW92tNfl/SKwkFayHA==}
+  '@studio-baeks/paper-ui@0.1.4':
+    resolution: {integrity: sha512-HPa8a53FA2D4D8UbnRNwuvJ9ewxdOkSHSrIEVzjux/hB+H93sBIJhQGwXLQabch+tfpVCPeWT4G6auAcSjcGUA==}
     peerDependencies:
       react: ^18.2.0 || ^19.0.0
       react-dom: ^18.2.0 || ^19.0.0
@@ -1112,6 +1124,14 @@ snapshots:
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
 
+  '@react-aria/calendar@3.10.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+    dependencies:
+      '@swc/helpers': 0.5.24
+      react: 19.3.0
+      react-aria: 3.53.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      react-dom: 19.3.0(react@19.3.0)
+      react-stately: 3.51.0(react@19.3.0)
+
   '@react-aria/dnd@3.12.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@react-types/shared': 3.37.0(react@19.3.0)
@@ -1173,6 +1193,13 @@ snapshots:
       react: 19.3.0
       react-aria: 3.53.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react-dom: 19.3.0(react@19.3.0)
+
+  '@react-stately/calendar@3.10.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+    dependencies:
+      '@swc/helpers': 0.5.24
+      react: 19.3.0
+      react-dom: 19.3.0(react@19.3.0)
+      react-stately: 3.51.0(react@19.3.0)
 
   '@react-types/shared@3.37.0(react@19.3.0)':
     dependencies:
@@ -1255,8 +1282,10 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.63.5':
     optional: true
 
-  '@studio-baeks/paper-ui@0.1.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@studio-baeks/paper-ui@0.1.4(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
+      '@internationalized/date': 3.12.4
+      '@react-aria/calendar': 3.10.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@react-aria/dnd': 3.12.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@react-aria/focus': 3.22.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@react-aria/i18n': 3.13.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -1265,6 +1294,7 @@ snapshots:
       '@react-aria/overlays': 3.32.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@react-aria/utils': 3.34.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@react-aria/visually-hidden': 3.9.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@react-stately/calendar': 3.10.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
 
